@@ -691,32 +691,36 @@ function syncToServer() {
 
 function connectToServer() {
   if (!isServed()) return;
-  const es = new EventSource("/api/events");
-  es.addEventListener("open", () => {
-    if (liveDot) liveDot.classList.add("is-live");
-    syncToServer();
-  });
-  es.addEventListener("message", (event) => {
-    try {
-      const incoming = JSON.parse(event.data);
-      if (!incoming?.scores) return;
-      isApplyingServerUpdate = true;
-      state.scores = normalizeScores(incoming.scores);
-      if (incoming.pins && typeof incoming.pins === "object") state.pins = incoming.pins;
-      if (Array.isArray(incoming.chat)) {
-        const ids = new Set((state.chat || []).map(m => m.id));
-        const fresh = incoming.chat.filter(m => !ids.has(m.id));
-        state.chat = [...(state.chat || []), ...fresh].sort((a, b) => a.ts - b.ts).slice(-100);
-        if (!document.getElementById("chat-modal").hidden) renderChat();
-      }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      renderAll();
-      isApplyingServerUpdate = false;
-    } catch { isApplyingServerUpdate = false; }
-  });
-  es.addEventListener("error", () => {
+  try {
+    const es = new EventSource("/api/events");
+    es.addEventListener("open", () => {
+      if (liveDot) liveDot.classList.add("is-live");
+      syncToServer();
+    });
+    es.addEventListener("message", (event) => {
+      try {
+        const incoming = JSON.parse(event.data);
+        if (!incoming?.scores) return;
+        isApplyingServerUpdate = true;
+        state.scores = normalizeScores(incoming.scores);
+        if (incoming.pins && typeof incoming.pins === "object") state.pins = incoming.pins;
+        if (Array.isArray(incoming.chat)) {
+          const ids = new Set((state.chat || []).map(m => m.id));
+          const fresh = incoming.chat.filter(m => !ids.has(m.id));
+          state.chat = [...(state.chat || []), ...fresh].sort((a, b) => a.ts - b.ts).slice(-100);
+          if (!document.getElementById("chat-modal").hidden) renderChat();
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        renderAll();
+        isApplyingServerUpdate = false;
+      } catch { isApplyingServerUpdate = false; }
+    });
+    es.addEventListener("error", () => {
+      if (liveDot) liveDot.classList.remove("is-live");
+    });
+  } catch {
     if (liveDot) liveDot.classList.remove("is-live");
-  });
+  }
 }
 
 // --- Player lookup & identity ---
