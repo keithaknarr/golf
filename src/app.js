@@ -1,6 +1,25 @@
 const STORAGE_KEY = "mcc-golf-2026-v1";
 const MY_NAME_KEY  = "mcc-2026-my-name";
 
+function getAppBasePath() {
+  try {
+    const currentPath = typeof window !== "undefined" && window.location?.pathname ? window.location.pathname : "/";
+    const normalized = currentPath.endsWith("/") ? currentPath : `${currentPath}/`;
+    if (normalized === "/") return "/";
+    return normalized.replace(/\/index\.html\/?$/, "/");
+  } catch {
+    return "/";
+  }
+}
+
+const APP_BASE_PATH = getAppBasePath();
+
+function buildApiUrl(pathname) {
+  const normalizedPath = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  if (APP_BASE_PATH === "/") return normalizedPath;
+  return `${APP_BASE_PATH.replace(/\/$/, "")}${normalizedPath}`;
+}
+
 const COURSES = {
   skytop: {
     name: "Skytop Golf Course",
@@ -695,7 +714,7 @@ function syncToServer() {
   if (!isServed()) return;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(() => {
-    fetch("/api/state", {
+    fetch(buildApiUrl("/api/state"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(state),
@@ -706,7 +725,7 @@ function syncToServer() {
 function connectToServer() {
   if (!isServed()) return;
   try {
-    const es = new EventSource("/api/events");
+    const es = new EventSource(buildApiUrl("/api/events"));
     es.addEventListener("open", () => {
       if (liveDot) liveDot.classList.add("is-live");
       syncToServer();
