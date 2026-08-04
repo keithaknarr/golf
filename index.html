@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#08140f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>MCC Golf 2026</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="ambient ambient-one"></div>
+      <div class="ambient ambient-two"></div>
+
+      <header class="hero card">
+        <div class="hero-copy-block">
+          <p class="eyebrow">McCluskey Golf Group · BLOCK 080726 MCC</p>
+          <h1>MCC 2026</h1>
+        </div>
+        <div class="hero-stats" aria-live="polite">
+          <div class="stat">
+            <span class="stat-label">Round</span>
+            <strong id="hero-round">—</strong>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Course</span>
+            <strong id="hero-course">—</strong>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Standing</span>
+            <strong id="hero-leader">—</strong>
+          </div>
+        </div>
+      </header>
+
+      <nav class="tabs card" aria-label="Rounds">
+        <div class="tabs-rounds">
+          <button class="tab-button" type="button" data-round="today">⛳ Today</button>
+          <button class="tab-button" type="button" data-round="thu-pm">Thu PM</button>
+          <button class="tab-button" type="button" data-round="fri-am">Fri AM</button>
+          <button class="tab-button" type="button" data-round="fri-pm">Fri PM</button>
+          <button class="tab-button" type="button" data-round="sat-am">Sat AM</button>
+          <button class="tab-button" type="button" data-round="sat-pm">Sat PM</button>
+        </div>
+        <div class="tabs-actions">
+          <button class="ghost-button user-pill is-unset" id="user-pill" type="button">Who are you?</button>
+          <span id="live-dot" class="live-dot" title="Live sync">Live</span>
+        </div>
+      </nav>
+
+      <main class="layout">
+        <section class="view card panel" id="view-leaderboard">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow" id="lb-round-label">—</p>
+              <h2>Leaderboard</h2>
+            </div>
+            <span class="course-badge" id="lb-course-badge">—</span>
+          </div>
+          <div class="leaderboard-wrap">
+            <table class="leaderboard">
+              <thead>
+                <tr>
+                  <th scope="col" class="col-pos">Pos</th>
+                  <th scope="col" class="col-team">Team</th>
+                  <th scope="col">Net</th>
+                  <th scope="col">Thru</th>
+                  <th scope="col">H-start</th>
+                  <th scope="col">Gross</th>
+                  <th scope="col" class="hide-mobile">Tee time</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody id="lb-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view card panel" id="view-scorecard" hidden>
+          <div class="panel-heading">
+            <button class="ghost-button" id="back-btn" type="button">← Leaderboard</button>
+            <div>
+              <p class="eyebrow" id="sc-round-label">—</p>
+              <h2 id="sc-title">—</h2>
+            </div>
+            <div class="panel-heading-spacer"></div>
+          </div>
+
+          <div class="sc-layout">
+            <section class="subcard">
+              <div class="subcard-heading">
+                <div>
+                  <p class="eyebrow">Your team</p>
+                  <h3 id="sc-head-start">Head start: E</h3>
+                </div>
+              </div>
+              <ul class="player-list-ro" id="sc-players"></ul>
+              <div class="sc-totals">
+                <article class="summary-card sc-net-card">
+                  <span>Net</span>
+                  <strong id="sc-net">—</strong>
+                </article>
+                <article class="summary-card">
+                  <span>Gross</span>
+                  <strong id="sc-gross">—</strong>
+                </article>
+                <article class="summary-card">
+                  <span>Thru</span>
+                  <strong id="sc-thru">0/18</strong>
+                </article>
+                <article class="summary-card">
+                  <span>Front</span>
+                  <strong id="sc-front">—</strong>
+                </article>
+                <article class="summary-card">
+                  <span>Back</span>
+                  <strong id="sc-back">—</strong>
+                </article>
+                <article class="summary-card pin-card" id="sc-pins" hidden>
+                  <span>📍 Pins</span>
+                  <strong id="sc-pins-count">0</strong>
+                </article>
+              </div>
+            </section>
+
+            <section class="subcard">
+              <div class="scorecard-wrap">
+                <table class="scorecard">
+                  <thead>
+                    <tr>
+                      <th scope="col">Hole</th>
+                      <th scope="col">Yds</th>
+                      <th scope="col">Par</th>
+                      <th scope="col">SI</th>
+                      <th scope="col" class="score-col-header">Score</th>
+                      <th scope="col">+/−</th>
+                      <th scope="col" class="pin-col">📍 Pin</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sc-body"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <template id="lb-row-tpl">
+      <tr>
+        <td class="col-pos" data-pos></td>
+        <td class="col-team" data-players></td>
+        <td data-net></td>
+        <td data-thru></td>
+        <td data-head-start></td>
+        <td data-gross></td>
+        <td class="hide-mobile" data-tee-time></td>
+        <td class="col-action" data-action></td>
+      </tr>
+    </template>
+
+    <template id="sc-hole-tpl">
+      <tr>
+        <th scope="row" class="hole-label" data-num></th>
+        <td class="hole-length" data-yds></td>
+        <td class="hole-par" data-par></td>
+        <td class="hole-stroke-index" data-si></td>
+        <td class="score-cell">
+          <div class="score-stepper">
+            <button type="button" class="score-btn" data-minus aria-label="Decrease">−</button>
+            <span class="score-display score-display-empty" data-score-display>—</span>
+            <button type="button" class="score-btn score-btn-plus" data-plus aria-label="Increase">+</button>
+          </div>
+        </td>
+        <td><span class="result-pill" data-result></span></td>
+        <td class="pin-col" data-pin-cell></td>
+      </tr>
+    </template>
+
+    <template id="sc-sub-tpl">
+      <tr class="subtotal-row">
+        <th scope="row" data-sub-label></th>
+        <td data-sub-yds></td>
+        <td data-sub-par></td>
+        <td></td>
+        <td data-sub-score></td>
+        <td data-sub-result></td>
+      </tr>
+    </template>
+
+    <button class="chat-fab" id="open-chat" type="button" title="Trash Talk">
+      💬
+      <span class="chat-badge" id="chat-badge" hidden>!</span>
+    </button>
+
+    <div class="modal-overlay" id="chat-modal" hidden>
+      <div class="modal-card card chat-card">
+        <div class="modal-header">
+          <h2>💬 Trash Talk</h2>
+          <button class="icon-button" id="close-chat" type="button" aria-label="Close">×</button>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" placeholder="Say something..." maxlength="200" autocomplete="off" />
+          <button class="primary-button" id="chat-send" type="button">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="player-modal" hidden>
+      <div class="modal-card card">
+        <div class="modal-header">
+          <h2>Find my rounds</h2>
+          <button class="icon-button" id="close-modal" type="button" aria-label="Close">&#215;</button>
+        </div>
+        <p class="modal-hint">Tap your name to see all 5 of your rounds, teammates, and tee times.</p>
+        <div class="player-grid" id="player-grid"></div>
+        <div id="player-schedule"></div>
+      </div>
+    </div>
+
+    <div class="identity-overlay" id="identity-overlay">
+      <div class="identity-card card">
+        <p class="eyebrow">MCC 2026 · Aug 6–8</p>
+        <h2>Who are you?</h2>
+        <p class="identity-hint">Pick your name to personalize your scorecard, leaderboard, and schedule.</p>
+        <div class="identity-player-grid" id="identity-player-grid"></div>
+      </div>
+    </div>
+
+    <script src="./src/app.js"></script>
+  </body>
+</html>
