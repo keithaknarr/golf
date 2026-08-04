@@ -20,15 +20,15 @@ const COURSES = {
 
 const ROUNDS = [
   {
-    // Individual stroke play — White tees, 69.5/126, par 72
+    // Individual stroke play — GreyHawk Front 9
     id: "today", label: "Today", fullLabel: "Today · Individual",
     format: "individual",
     course: {
-      name: "Today's Course (White)",
-      par: 72,
-      pars:  [4,3,4,5,3,4,5,4,4, 5,3,4,3,5,4,4,3,5],
-      yards: [376,167,301,485,154,354,527,346,366, 515,148,380,148,512,374,377,166,544],
-      si:    [11,17,13,7,15,9,1,5,3, 6,12,8,16,2,14,10,18,4],
+      name: "GreyHawk Front 9",
+      par: 36,
+      pars:  [4,3,4,5,3,4,5,4,4],
+      yards: [376,167,301,485,154,354,527,346,366],
+      si:    [11,17,13,7,15,9,1,5,3],
     },
     teams: [
       { tee:1, teeTime:"", headStart:0, players:[{name:"Jake",hcp:0}]},
@@ -178,13 +178,18 @@ function fmtHeadStart(hs) {
   return hs === 0 ? "E" : String(hs);
 }
 
+function holeCountForCourse(course) {
+  return Array.isArray(course?.pars) ? course.pars.length : 18;
+}
+
 // --- State ---
 
 function emptyScores() {
   const s = {};
   for (const r of ROUNDS) {
     s[r.id] = {};
-    for (const t of r.teams) s[r.id][t.tee] = Array(18).fill("");
+    const holeCount = holeCountForCourse(r.course);
+    for (const t of r.teams) s[r.id][t.tee] = Array(holeCount).fill("");
   }
   return s;
 }
@@ -193,11 +198,15 @@ function normalizeScores(raw) {
   const s = {};
   for (const r of ROUNDS) {
     s[r.id] = {};
+    const holeCount = holeCountForCourse(r.course);
     for (const t of r.teams) {
       const saved = raw?.[r.id]?.[t.tee];
-      s[r.id][t.tee] = Array.isArray(saved) && saved.length === 18
-        ? saved.map(h => (h == null || h === "") ? "" : String(h))
-        : Array(18).fill("");
+      s[r.id][t.tee] = Array.isArray(saved)
+        ? Array.from({ length: holeCount }, (_, i) => {
+            const h = saved[i];
+            return h == null || h === "" ? "" : String(h);
+          })
+        : Array(holeCount).fill("");
     }
   }
   return s;
@@ -243,8 +252,9 @@ function saveState() {
 
 function calcMetrics(roundId, tee, course) {
   const holes = state.scores[roundId]?.[tee] ?? [];
+  const holeCount = holeCountForCourse(course);
   let gross = 0, parUsed = 0, played = 0, front = 0, back = 0;
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < holeCount; i++) {
     const s = parseNumber(holes[i]);
     if (s !== null) {
       gross += s; parUsed += course.pars[i]; played++;
@@ -327,6 +337,7 @@ function sortedTeams(round) {
 function renderLeaderboard(round) {
   lbRoundLabel.textContent  = round.fullLabel;
   lbCourseBadge.textContent = round.course.name;
+  const holeCount = holeCountForCourse(round.course);
 
   const teams = sortedTeams(round);
   lbBody.innerHTML = "";
@@ -384,16 +395,16 @@ function renderLeaderboard(round) {
       }
     } else { netEl.textContent = "—"; }
 
-    frag.querySelector("[data-thru]").textContent = m.played > 0 ? `${m.played}/18` : "—";
+    frag.querySelector("[data-thru]").textContent = m.played > 0 ? `${m.played}/${holeCount}` : "—";
 
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = (!isIndividual && isMyTeam) ? "ghost-button enter-scores-btn is-my-team-btn" : "ghost-button enter-scores-btn";
     btn.textContent = isIndividual
-      ? (m.played === 18 ? "View scores" : m.played > 0 ? "Scores →" : "Enter scores")
+      ? (m.played === holeCount ? "View scores" : m.played > 0 ? "Scores →" : "Enter scores")
       : isMyTeam
-        ? (m.played === 18 ? "My scores" : m.played > 0 ? "My card →" : "My card")
-        : (m.played === 18 ? "View" : m.played > 0 ? "Continue →" : "Enter scores");
+        ? (m.played === holeCount ? "My scores" : m.played > 0 ? "My card →" : "My card")
+        : (m.played === holeCount ? "View" : m.played > 0 ? "Continue →" : "Enter scores");
     btn.addEventListener("click", () => {
       state.activeView = "scorecard";
       state.activeTee  = team.tee;
@@ -405,7 +416,7 @@ function renderLeaderboard(round) {
   });
 
   // Trophy for leader when all teams finish
-  const allDone = round.teams.every(t => calcMetrics(round.id, t.tee, round.course).played === 18);
+  const allDone = round.teams.every(t => calcMetrics(round.id, t.tee, round.course).played === holeCount);
   if (allDone && teams.length > 0) {
     const winnerPosEl = lbBody.querySelector("tr:first-child [data-pos]");
     if (winnerPosEl) winnerPosEl.textContent = "🏆";
@@ -522,6 +533,7 @@ function openPinPicker(cell, round, holeIdx, team, currentWinner) {
 
 function buildScorecardBody(round, team) {
   const course = round.course;
+  const holeCount = holeCountForCourse(course);
   const holes  = state.scores[round.id][team.tee];
   scBody.innerHTML = "";
   scBody.closest("table").classList.toggle("has-pins", round.format === "individual");
@@ -539,7 +551,7 @@ function buildScorecardBody(round, team) {
     scBody.appendChild(frag);
   };
 
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < holeCount; i++) {
     if (i === 9) addSubRow("front", 0, 9);
     const frag = scHoleTpl.content.cloneNode(true);
     const row  = frag.querySelector("tr");
@@ -582,13 +594,14 @@ function buildScorecardBody(round, team) {
     scBody.appendChild(frag);
   }
 
-  addSubRow("back", 9, 18);
-  addSubRow("total", 0, 18);
+  if (holeCount > 9) addSubRow("back", 9, holeCount);
+  addSubRow("total", 0, holeCount);
   updateSubtotals(round, team);
 }
 
 function updateSubtotals(round, team) {
   const course = round.course;
+  const holeCount = holeCountForCourse(course);
   const holes  = state.scores[round.id][team.tee];
 
   const updateRow = (label, start, end) => {
@@ -616,17 +629,18 @@ function updateSubtotals(round, team) {
     }
   };
 
-  updateRow("front", 0, 9);
-  updateRow("back",  9, 18);
-  updateRow("total", 0, 18);
+  updateRow("front", 0, Math.min(9, holeCount));
+  if (holeCount > 9) updateRow("back", 9, holeCount);
+  updateRow("total", 0, holeCount);
 }
 
 function updateScorecardTotals(round, team) {
+  const holeCount = holeCountForCourse(round.course);
   const m = calcMetrics(round.id, team.tee, round.course);
   scGross.textContent = m.gross !== null ? String(m.gross) : "—";
   scFront.textContent = m.front !== null ? String(m.front) : "—";
-  scBack.textContent  = m.back  !== null ? String(m.back)  : "—";
-  scThru.textContent  = `${m.played}/18`;
+  scBack.textContent  = holeCount > 9 && m.back !== null ? String(m.back) : "—";
+  scThru.textContent  = `${m.played}/${holeCount}`;
   if (m.relToPar !== null) {
     const net = m.relToPar + team.headStart;
     scNet.textContent = fmtScore(net);
