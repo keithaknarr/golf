@@ -264,7 +264,13 @@ let isApplyingServerUpdate = false;
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  if (!isApplyingServerUpdate) syncToServer();
+  if (!isApplyingServerUpdate) {
+    syncToServer();
+    try {
+      const syncMarker = `${Date.now()}`;
+      localStorage.setItem(`${STORAGE_KEY}:sync`, syncMarker);
+    } catch {}
+  }
 }
 
 // --- Metrics ---
@@ -730,6 +736,11 @@ function connectToServer() {
       if (liveDot) liveDot.classList.add("is-live");
       syncToServer();
     });
+    window.addEventListener("storage", (event) => {
+      if (event.key === `${STORAGE_KEY}:sync` && event.newValue) {
+        syncToServer();
+      }
+    });
     es.addEventListener("message", (event) => {
       try {
         const incoming = JSON.parse(event.data);
@@ -744,6 +755,7 @@ function connectToServer() {
           if (!document.getElementById("chat-modal").hidden) renderChat();
         }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        localStorage.setItem(`${STORAGE_KEY}:last-server-update`, String(Date.now()));
         renderAll();
         isApplyingServerUpdate = false;
       } catch { isApplyingServerUpdate = false; }
