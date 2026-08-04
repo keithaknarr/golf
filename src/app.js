@@ -321,6 +321,7 @@ const scBack  = document.getElementById("sc-back");
 const backBtn   = document.getElementById("back-btn");
 const liveDot   = document.getElementById("live-dot");
 const roundTabs = Array.from(document.querySelectorAll("[data-round]"));
+const saveScoreBtn = document.getElementById("save-score-btn");
 
 // --- Render ---
 
@@ -701,6 +702,19 @@ backBtn.addEventListener("click", () => {
   saveState();
   renderAll();
 });
+
+if (saveScoreBtn) {
+  saveScoreBtn.addEventListener("click", () => {
+    saveState();
+    if (saveScoreBtn) {
+      const original = saveScoreBtn.textContent;
+      saveScoreBtn.textContent = "Saved";
+      setTimeout(() => {
+        saveScoreBtn.textContent = original;
+      }, 900);
+    }
+  });
+}
 
 roundTabs.forEach(btn => {
   btn.addEventListener("click", () => {
