@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "scripts/start.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "scripts/start.js" },
+    { "src": "/(.*)", "dest": "scripts/start.js" }
+  ]
+}

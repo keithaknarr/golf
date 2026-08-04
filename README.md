@@ -17,9 +17,11 @@ Golf scramble score tracker with a team page and leaderboard page.
 
 Run `npm start`, then open http://localhost:8000.
 
-You can also open `index.html` directly in a browser if you prefer.
-
 Use the Team page to enter scores. Use the Leaderboard page to compare teams.
+
+## Hosting
+
+This app uses a small Node server for live score syncing, so it should be deployed on a host that supports server-side Node.js. A Vercel deployment is configured in `vercel.json`.
 
 ## Files
 
