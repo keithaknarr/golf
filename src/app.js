@@ -313,6 +313,7 @@ const backBtn   = document.getElementById("back-btn");
 const liveDot   = document.getElementById("live-dot");
 const roundTabs = Array.from(document.querySelectorAll("[data-round]"));
 const saveScoreBtn = document.getElementById("save-score-btn");
+const lbPrimaryAction = document.getElementById("lb-primary-action");
 
 // --- Render ---
 
@@ -365,6 +366,24 @@ function renderLeaderboard(round) {
   const myNetLB  = (myMtrLB && myMtrLB.relToPar !== null) ? myMtrLB.relToPar + myTeamLB.headStart : null;
   const isIndividual = round.format === "individual";
 
+  if (lbPrimaryAction) {
+    lbPrimaryAction.innerHTML = "";
+    if (myTeamLB) {
+      const myProgress = calcMetrics(round.id, myTeamLB.tee, round.course);
+      const actionBtn = document.createElement("button");
+      actionBtn.type = "button";
+      actionBtn.className = "primary-button lb-action-btn";
+      actionBtn.textContent = myProgress.played > 0 ? "My Card / Enter Scores" : "Enter Scores / My Card";
+      actionBtn.addEventListener("click", () => {
+        state.activeView = "scorecard";
+        state.activeTee = myTeamLB.tee;
+        saveState();
+        renderAll();
+      });
+      lbPrimaryAction.appendChild(actionBtn);
+    }
+  }
+
   teams.forEach((team, i) => {
     const m        = calcMetrics(round.id, team.tee, round.course);
     const isMyTeam = myTeamLB !== null && team.tee === myTeamLB.tee;
@@ -414,21 +433,25 @@ function renderLeaderboard(round) {
 
     frag.querySelector("[data-thru]").textContent = m.played > 0 ? `${m.played}/${holeCount}` : "—";
 
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = (!isIndividual && isMyTeam) ? "ghost-button enter-scores-btn is-my-team-btn" : "ghost-button enter-scores-btn";
-    btn.textContent = isIndividual
-      ? (m.played === holeCount ? "View scores" : m.played > 0 ? "Scores →" : "Enter scores")
-      : isMyTeam
-        ? (m.played === holeCount ? "My scores" : m.played > 0 ? "My card →" : "My card")
-        : (m.played === holeCount ? "View" : m.played > 0 ? "Continue →" : "Enter scores");
-    btn.addEventListener("click", () => {
-      state.activeView = "scorecard";
-      state.activeTee  = team.tee;
-      saveState();
-      renderAll();
-    });
-    frag.querySelector("[data-action]").appendChild(btn);
+    const actionCell = frag.querySelector("[data-action]");
+    if (isMyTeam) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = (!isIndividual && isMyTeam) ? "ghost-button enter-scores-btn is-my-team-btn" : "ghost-button enter-scores-btn";
+      btn.textContent = m.played === holeCount ? "My scores" : m.played > 0 ? "My card →" : "My card";
+      btn.addEventListener("click", () => {
+        state.activeView = "scorecard";
+        state.activeTee  = team.tee;
+        saveState();
+        renderAll();
+      });
+      actionCell.appendChild(btn);
+    } else {
+      const lock = document.createElement("span");
+      lock.className = "score-lock-pill";
+      lock.textContent = "Locked";
+      actionCell.appendChild(lock);
+    }
     lbBody.appendChild(frag);
   });
 
@@ -469,6 +492,16 @@ function renderLeaderboard(round) {
 function renderScorecardView(round) {
   const team = round.teams.find(t => t.tee === state.activeTee);
   if (!team) return;
+  const canEdit = !!myName && team.players.some(p => p.name === myName);
+
+  if (!canEdit) {
+    const myTeam = myName ? round.teams.find(t => t.players.some(p => p.name === myName)) : null;
+    state.activeView = "leaderboard";
+    state.activeTee = myTeam ? myTeam.tee : null;
+    saveState();
+    renderAll();
+    return;
+  }
 
   scRoundLabel.textContent = round.fullLabel;
   scTitle.textContent      = round.format === "individual"
@@ -493,7 +526,7 @@ function renderScorecardView(round) {
     scPlayers.appendChild(li);
   }
 
-  buildScorecardBody(round, team);
+  buildScorecardBody(round, team, canEdit);
   updateScorecardTotals(round, team);
 }
 
@@ -548,7 +581,7 @@ function openPinPicker(cell, round, holeIdx, team, currentWinner) {
   cell.appendChild(wrap);
 }
 
-function buildScorecardBody(round, team) {
+function buildScorecardBody(round, team, canEdit = true) {
   const course = round.course;
   const holeCount = holeCountForCourse(course);
   const holes  = state.scores[round.id][team.tee];
@@ -586,6 +619,9 @@ function buildScorecardBody(round, team) {
     minusBtn.setAttribute("aria-label", `Decrease score for hole ${i + 1}`);
     plusBtn.setAttribute("aria-label", `Increase score for hole ${i + 1}`);
     clearBtn.setAttribute("aria-label", `Clear score for hole ${i + 1}`);
+    minusBtn.disabled = !canEdit;
+    plusBtn.disabled = !canEdit;
+    clearBtn.disabled = !canEdit;
 
     updateStepperDisplay(displayEl, resultEl, parseNumber(holes[i]), course.pars[i]);
 
@@ -615,7 +651,11 @@ function buildScorecardBody(round, team) {
 
     if (round.format === "individual" && course.pars[i] === 3) {
       const pinCell = frag.querySelector("[data-pin-cell]");
-      if (pinCell) renderPinCell(pinCell, round, i, team);
+      if (pinCell && canEdit) renderPinCell(pinCell, round, i, team);
+      if (pinCell && !canEdit) {
+        const winner = state.pins[round.id]?.[i] || null;
+        pinCell.textContent = winner ? `📍 ${winner.split(" ")[0]}` : "";
+      }
     }
     scBody.appendChild(frag);
   }
