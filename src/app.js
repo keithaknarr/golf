@@ -335,6 +335,16 @@ const roundTabs = Array.from(document.querySelectorAll("[data-round]"));
 const saveScoreBtn = document.getElementById("save-score-btn");
 const lbPrimaryAction = document.getElementById("lb-primary-action");
 let scorecardTeamDetailsOpen = false;
+let saveFeedbackTimer = null;
+
+function showSaveFeedback(label = "Saved") {
+  if (!saveScoreBtn) return;
+  saveScoreBtn.textContent = label;
+  if (saveFeedbackTimer) clearTimeout(saveFeedbackTimer);
+  saveFeedbackTimer = setTimeout(() => {
+    saveScoreBtn.textContent = "Save";
+  }, 900);
+}
 
 // --- Render ---
 
@@ -709,6 +719,7 @@ function buildScorecardBody(round, team, canEdit = true) {
     const setScore = (newVal) => {
       state.scores[round.id][team.tee][i] = newVal === null ? "" : String(Math.max(1, Math.min(12, newVal)));
       saveState();
+      showSaveFeedback("Auto-saved");
       updateStepperDisplay(displayEl, resultEl, parseNumber(state.scores[round.id][team.tee][i]), course.pars[i]);
       updateSubtotals(round, team);
       updateScorecardTotals(round, team);
@@ -833,13 +844,7 @@ backBtn.addEventListener("click", () => {
 if (saveScoreBtn) {
   saveScoreBtn.addEventListener("click", () => {
     saveState();
-    if (saveScoreBtn) {
-      const original = saveScoreBtn.textContent;
-      saveScoreBtn.textContent = "Saved";
-      setTimeout(() => {
-        saveScoreBtn.textContent = original;
-      }, 900);
-    }
+    showSaveFeedback("Saved");
   });
 }
 
