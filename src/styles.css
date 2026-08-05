@@ -1046,6 +1046,83 @@ button:disabled {
   transform: scale(0.97);
 }
 
+@media (max-width: 680px) {
+  .scorecard {
+    min-width: 360px;
+    table-layout: fixed;
+  }
+
+  .scorecard th,
+  .scorecard td {
+    padding: 7px 4px;
+  }
+
+  .scorecard th.col-hole,
+  .scorecard td.hole-label {
+    width: 26px;
+    min-width: 26px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .scorecard th.col-yds,
+  .scorecard td.hole-length {
+    width: 42px;
+    min-width: 42px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .scorecard th.col-par,
+  .scorecard td.hole-par,
+  .scorecard th.col-hc,
+  .scorecard td.hole-stroke-index {
+    width: 24px;
+    min-width: 24px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .scorecard th.col-diff,
+  .scorecard td.result-cell {
+    width: 48px;
+    min-width: 48px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .score-cell {
+    padding: 4px 2px !important;
+  }
+
+  .score-stepper {
+    gap: 4px;
+  }
+
+  .score-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 1.05rem;
+  }
+
+  .score-display {
+    min-width: 22px;
+    font-size: 1.05rem;
+  }
+
+  .score-clear-btn {
+    height: 24px;
+    padding: 0 6px;
+    font-size: 0.62rem;
+  }
+
+  .result-pill {
+    min-width: 36px;
+    padding: 4px 6px;
+    font-size: 0.74rem;
+  }
+}
+
 .score-display-empty  { color: rgba(158,184,171,0.35); }
 .score-display-eagle  { color: #ffe08a; }
 .score-display-birdie { color: var(--accent); }
