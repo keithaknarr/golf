@@ -207,7 +207,8 @@ h3 {
 
 .tabs-rounds::-webkit-scrollbar { display: none; }
 
-.tabs-actions {
+.tabs-user-left,
+.tabs-status-right {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -631,6 +632,15 @@ button:disabled {
 
   .tabs {
     flex-direction: row;
+  }
+
+  .tabs {
+    gap: 4px;
+  }
+
+  .tabs-user-left,
+  .tabs-status-right {
+    gap: 2px;
   }
 
   .scorecard input[data-score] {
