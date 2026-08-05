@@ -356,7 +356,7 @@ function enforceScorecardSectionOrder() {
 
   if (scoreSection && totals && !scoreSection.contains(totals)) {
     if (scoreWrap && scoreWrap.parentElement === scoreSection) {
-      scoreSection.insertBefore(totals, scoreWrap);
+      scoreSection.insertBefore(totals, scoreWrap.nextSibling);
     } else {
       scoreSection.appendChild(totals);
     }

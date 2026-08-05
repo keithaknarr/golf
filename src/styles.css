@@ -688,15 +688,64 @@ button:disabled {
 
 .sc-layout {
   display: grid;
-  gap: 18px;
+  gap: 12px;
   grid-template-columns: 1fr;
 }
 
 .sc-score-entry { order: 1; }
 .sc-team-summary { order: 2; }
 
+.sc-score-entry {
+  padding: 8px;
+}
+
+.sc-score-entry .subcard-heading {
+  margin-bottom: 4px;
+}
+
+.sc-score-entry .subcard-heading .eyebrow {
+  margin-bottom: 0;
+}
+
+.sc-score-entry #save-score-btn {
+  padding: 6px 12px;
+  font-size: 0.86rem;
+}
+
 .sc-score-entry .sc-totals {
-  margin: 0 0 12px;
+  margin: 6px 0 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 5px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  padding-bottom: 2px;
+}
+
+.sc-score-entry .summary-card {
+  padding: 5px 8px;
+  border-radius: 10px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: max-content;
+  flex: 0 0 auto;
+}
+
+.sc-score-entry .summary-card span {
+  font-size: 0.62rem;
+  letter-spacing: 0.03em;
+}
+
+.sc-score-entry .summary-card strong {
+  margin-top: 0;
+  font-size: 0.86rem;
+  line-height: 1;
+}
+
+.sc-score-entry .scorecard-wrap {
+  margin-top: 6px;
 }
 
 .sc-team-summary {
@@ -929,6 +978,25 @@ button:disabled {
 
 @media (max-width: 680px) {
   .sc-totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sc-score-entry {
+    padding: 7px;
+  }
+  .sc-score-entry .sc-totals {
+    gap: 4px;
+  }
+  .sc-score-entry .summary-card {
+    padding: 4px 7px;
+  }
+  .sc-score-entry .summary-card span {
+    font-size: 0.58rem;
+  }
+  .sc-score-entry .summary-card strong {
+    font-size: 0.8rem;
+  }
+  .sc-score-entry #save-score-btn {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
   .sc-team-summary .player-list-ro { grid-template-columns: 1fr; }
 }
 

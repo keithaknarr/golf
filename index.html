@@ -97,9 +97,24 @@
               <div class="subcard-heading">
                 <div>
                   <p class="eyebrow">Entering scores</p>
-                  <h3>Score input</h3>
                 </div>
                 <button class="primary-button" id="save-score-btn" type="button">Save</button>
+              </div>
+              <div class="scorecard-wrap">
+                <table class="scorecard">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="score-col-header">Score</th>
+                      <th scope="col" class="col-hole">Hole</th>
+                      <th scope="col" class="col-yds">Yds</th>
+                      <th scope="col" class="col-par">Par</th>
+                      <th scope="col" class="col-hc">HC</th>
+                      <th scope="col" class="col-diff">+/−</th>
+                      <th scope="col" class="pin-col">📍 Pin</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sc-body"></tbody>
+                </table>
               </div>
               <div class="sc-totals">
                 <article class="summary-card sc-net-card">
@@ -126,22 +141,6 @@
                   <span>📍 Pins</span>
                   <strong id="sc-pins-count">0</strong>
                 </article>
-              </div>
-              <div class="scorecard-wrap">
-                <table class="scorecard">
-                  <thead>
-                    <tr>
-                      <th scope="col" class="score-col-header">Score</th>
-                      <th scope="col" class="col-hole">Hole</th>
-                      <th scope="col" class="col-yds">Yds</th>
-                      <th scope="col" class="col-par">Par</th>
-                      <th scope="col" class="col-hc">HC</th>
-                      <th scope="col" class="col-diff">+/−</th>
-                      <th scope="col" class="pin-col">📍 Pin</th>
-                    </tr>
-                  </thead>
-                  <tbody id="sc-body"></tbody>
-                </table>
               </div>
             </section>
 
