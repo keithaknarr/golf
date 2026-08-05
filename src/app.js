@@ -424,28 +424,37 @@ function renderLeaderboard(round) {
 
   if (lbPrimaryAction) {
     lbPrimaryAction.innerHTML = "";
-    if (myName) {
-      const matchupsBtn = document.createElement("button");
-      matchupsBtn.type = "button";
-      matchupsBtn.className = "ghost-button enter-scores-btn";
-      matchupsBtn.textContent = "My Matchups";
-      matchupsBtn.addEventListener("click", () => openPlayerModal(myName));
-      lbPrimaryAction.appendChild(matchupsBtn);
-    }
-    if (myTeamLB) {
-      const myProgress = calcMetrics(round.id, myTeamLB.tee, round.course);
-      const actionBtn = document.createElement("button");
-      actionBtn.type = "button";
-      actionBtn.className = "primary-button lb-action-btn";
-      actionBtn.textContent = myProgress.played > 0 ? "My Card / Enter Scores" : "Enter Scores / My Card";
-      actionBtn.addEventListener("click", () => {
-        state.activeView = "scorecard";
-        state.activeTee = myTeamLB.tee;
-        saveState();
-        renderAll();
-      });
-      lbPrimaryAction.appendChild(actionBtn);
-    }
+
+    const makeTab = (label, onClick, { active = false, disabled = false } = {}) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "ghost-button lb-tab-btn" + (active ? " is-active" : "");
+      btn.textContent = label;
+      btn.disabled = disabled;
+      if (active) btn.setAttribute("aria-current", "page");
+      btn.addEventListener("click", onClick);
+      return btn;
+    };
+
+    lbPrimaryAction.appendChild(makeTab("Enter Scores", () => {
+      if (!myTeamLB) return;
+      state.activeView = "scorecard";
+      state.activeTee = myTeamLB.tee;
+      saveState();
+      renderAll();
+    }, { disabled: !myTeamLB }));
+
+    lbPrimaryAction.appendChild(makeTab("Leaderboard", () => {
+      state.activeView = "leaderboard";
+      state.activeTee = null;
+      saveState();
+      renderAll();
+    }, { active: true }));
+
+    lbPrimaryAction.appendChild(makeTab("Matchups", () => {
+      if (!myName) return;
+      openPlayerModal(myName);
+    }, { disabled: !myName }));
   }
 
   teams.forEach((team, i) => {
