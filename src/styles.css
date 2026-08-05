@@ -1048,8 +1048,9 @@ button:disabled {
 
 @media (max-width: 680px) {
   .scorecard {
+    width: max-content;
     min-width: 360px;
-    table-layout: fixed;
+    table-layout: auto;
   }
 
   .scorecard th,
@@ -1093,6 +1094,8 @@ button:disabled {
 
   .score-cell {
     padding: 4px 2px !important;
+    width: 132px;
+    min-width: 132px;
   }
 
   .score-stepper {
@@ -1100,20 +1103,20 @@ button:disabled {
   }
 
   .score-btn {
-    width: 30px;
-    height: 30px;
-    font-size: 1.05rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.98rem;
   }
 
   .score-display {
-    min-width: 22px;
-    font-size: 1.05rem;
+    min-width: 18px;
+    font-size: 0.95rem;
   }
 
   .score-clear-btn {
-    height: 24px;
-    padding: 0 6px;
-    font-size: 0.62rem;
+    height: 22px;
+    padding: 0 5px;
+    font-size: 0.58rem;
   }
 
   .result-pill {
