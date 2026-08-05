@@ -105,6 +105,14 @@ const server = http.createServer((request, response) => {
     return;
   }
 
+  // Allow clients to poll latest shared state as a fallback to SSE
+  if (pathname === "/api/state" && method === "GET") {
+    response.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+    if (!isHead) response.end(JSON.stringify(serverState || {}));
+    else response.end();
+    return;
+  }
+
   // Receive full state from a client and broadcast to everyone
   if (pathname === "/api/state" && request.method === "POST") {
     let body = "";

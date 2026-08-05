@@ -251,6 +251,7 @@ function loadState() {
 let state  = loadState();
 let myName = localStorage.getItem(MY_NAME_KEY) || null;
 let syncTimer = null;
+let syncPollTimer = null;
 let isApplyingServerUpdate = false;
 
 function saveState() {
@@ -262,6 +263,23 @@ function saveState() {
       localStorage.setItem(`${STORAGE_KEY}:sync`, syncMarker);
     } catch {}
   }
+}
+
+function applyIncomingState(incoming) {
+  if (!incoming?.scores) return;
+  isApplyingServerUpdate = true;
+  state.scores = normalizeScores(incoming.scores);
+  if (incoming.pins && typeof incoming.pins === "object") state.pins = incoming.pins;
+  if (Array.isArray(incoming.chat)) {
+    const ids = new Set((state.chat || []).map(m => m.id));
+    const fresh = incoming.chat.filter(m => !ids.has(m.id));
+    state.chat = [...(state.chat || []), ...fresh].sort((a, b) => a.ts - b.ts).slice(-100);
+    if (!document.getElementById("chat-modal").hidden) renderChat();
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(`${STORAGE_KEY}:last-server-update`, String(Date.now()));
+  renderAll();
+  isApplyingServerUpdate = false;
 }
 
 // --- Metrics ---
@@ -368,6 +386,14 @@ function renderLeaderboard(round) {
 
   if (lbPrimaryAction) {
     lbPrimaryAction.innerHTML = "";
+    if (myName) {
+      const matchupsBtn = document.createElement("button");
+      matchupsBtn.type = "button";
+      matchupsBtn.className = "ghost-button enter-scores-btn";
+      matchupsBtn.textContent = "My Matchups";
+      matchupsBtn.addEventListener("click", () => openPlayerModal(myName));
+      lbPrimaryAction.appendChild(matchupsBtn);
+    }
     if (myTeamLB) {
       const myProgress = calcMetrics(round.id, myTeamLB.tee, round.course);
       const actionBtn = document.createElement("button");
@@ -778,8 +804,20 @@ function syncToServer() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(state),
+    }).then((response) => {
+      if (response.status === 409) requestStateFromServer();
     }).catch(() => {});
   }, 300);
+}
+
+function requestStateFromServer() {
+  if (!isServed()) return;
+  fetch(buildApiUrl("/api/state"), { method: "GET" })
+    .then((response) => response.ok ? response.json() : null)
+    .then((incoming) => {
+      if (incoming && typeof incoming === "object") applyIncomingState(incoming);
+    })
+    .catch(() => {});
 }
 
 function connectToServer() {
@@ -788,6 +826,7 @@ function connectToServer() {
     const es = new EventSource(buildApiUrl("/api/events"));
     es.addEventListener("open", () => {
       if (liveDot) liveDot.classList.add("is-live");
+      requestStateFromServer();
       syncToServer();
     });
     window.addEventListener("storage", (event) => {
@@ -798,24 +837,16 @@ function connectToServer() {
     es.addEventListener("message", (event) => {
       try {
         const incoming = JSON.parse(event.data);
-        if (!incoming?.scores) return;
-        isApplyingServerUpdate = true;
-        state.scores = normalizeScores(incoming.scores);
-        if (incoming.pins && typeof incoming.pins === "object") state.pins = incoming.pins;
-        if (Array.isArray(incoming.chat)) {
-          const ids = new Set((state.chat || []).map(m => m.id));
-          const fresh = incoming.chat.filter(m => !ids.has(m.id));
-          state.chat = [...(state.chat || []), ...fresh].sort((a, b) => a.ts - b.ts).slice(-100);
-          if (!document.getElementById("chat-modal").hidden) renderChat();
-        }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        localStorage.setItem(`${STORAGE_KEY}:last-server-update`, String(Date.now()));
-        renderAll();
-        isApplyingServerUpdate = false;
+        applyIncomingState(incoming);
       } catch { isApplyingServerUpdate = false; }
     });
     es.addEventListener("error", () => {
       if (liveDot) liveDot.classList.remove("is-live");
+    });
+    if (syncPollTimer) clearInterval(syncPollTimer);
+    syncPollTimer = setInterval(requestStateFromServer, 5000);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) requestStateFromServer();
     });
   } catch {
     if (liveDot) liveDot.classList.remove("is-live");
@@ -939,11 +970,7 @@ function openIdentityPicker() {
 }
 
 userPillBtn.addEventListener("click", () => {
-  if (!myName) {
-    openIdentityPicker();
-  } else {
-    openPlayerModal(myName);
-  }
+  openIdentityPicker();
 });
 closeModalBtn.addEventListener("click", closePlayerModal);
 if (changeIdentityBtn) changeIdentityBtn.addEventListener("click", openIdentityPicker);
