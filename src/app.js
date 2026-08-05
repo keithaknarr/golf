@@ -580,7 +580,12 @@ function buildScorecardBody(round, team) {
     const displayEl = frag.querySelector("[data-score-display]");
     const minusBtn  = frag.querySelector("[data-minus]");
     const plusBtn   = frag.querySelector("[data-plus]");
+    const clearBtn  = frag.querySelector("[data-clear]");
     const resultEl  = frag.querySelector("[data-result]");
+
+    minusBtn.setAttribute("aria-label", `Decrease score for hole ${i + 1}`);
+    plusBtn.setAttribute("aria-label", `Increase score for hole ${i + 1}`);
+    clearBtn.setAttribute("aria-label", `Clear score for hole ${i + 1}`);
 
     updateStepperDisplay(displayEl, resultEl, parseNumber(holes[i]), course.pars[i]);
 
@@ -602,6 +607,10 @@ function buildScorecardBody(round, team) {
     plusBtn.addEventListener("click", () => {
       const curr = parseNumber(state.scores[round.id][team.tee][i]);
       setScore(curr === null ? course.pars[i] : curr + 1);
+    });
+
+    clearBtn.addEventListener("click", () => {
+      setScore(null);
     });
 
     if (round.format === "individual" && course.pars[i] === 3) {

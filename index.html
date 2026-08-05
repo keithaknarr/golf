@@ -129,11 +129,11 @@
                 <table class="scorecard">
                   <thead>
                     <tr>
+                      <th scope="col" class="score-col-header">Enter Score</th>
                       <th scope="col">Hole</th>
                       <th scope="col">Yds</th>
                       <th scope="col">Par</th>
                       <th scope="col">SI</th>
-                      <th scope="col" class="score-col-header">Score</th>
                       <th scope="col">+/−</th>
                       <th scope="col" class="pin-col">📍 Pin</th>
                     </tr>
@@ -162,17 +162,18 @@
 
     <template id="sc-hole-tpl">
       <tr>
+        <td class="score-cell">
+          <div class="score-stepper" role="group" aria-label="Score entry">
+            <button type="button" class="score-btn" data-minus aria-label="Decrease">−</button>
+            <span class="score-display score-display-empty" data-score-display>—</span>
+            <button type="button" class="score-btn score-btn-plus" data-plus aria-label="Increase">+</button>
+            <button type="button" class="score-clear-btn" data-clear aria-label="Clear score">Clear</button>
+          </div>
+        </td>
         <th scope="row" class="hole-label" data-num></th>
         <td class="hole-length" data-yds></td>
         <td class="hole-par" data-par></td>
         <td class="hole-stroke-index" data-si></td>
-        <td class="score-cell">
-          <div class="score-stepper">
-            <button type="button" class="score-btn" data-minus aria-label="Decrease">−</button>
-            <span class="score-display score-display-empty" data-score-display>—</span>
-            <button type="button" class="score-btn score-btn-plus" data-plus aria-label="Increase">+</button>
-          </div>
-        </td>
         <td><span class="result-pill" data-result></span></td>
         <td class="pin-col" data-pin-cell></td>
       </tr>
@@ -180,12 +181,13 @@
 
     <template id="sc-sub-tpl">
       <tr class="subtotal-row">
+        <td data-sub-score></td>
         <th scope="row" data-sub-label></th>
         <td data-sub-yds></td>
         <td data-sub-par></td>
         <td></td>
-        <td data-sub-score></td>
         <td data-sub-result></td>
+        <td class="pin-col"></td>
       </tr>
     </template>
 
