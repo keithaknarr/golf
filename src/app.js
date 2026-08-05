@@ -451,10 +451,6 @@ function renderLeaderboard(round) {
       renderAll();
     }, { active: true }));
 
-    lbPrimaryAction.appendChild(makeTab("Matchups", () => {
-      if (!myName) return;
-      openPlayerModal(myName);
-    }, { disabled: !myName }));
   }
 
   teams.forEach((team, i) => {
@@ -939,6 +935,7 @@ const playerModal    = document.getElementById("player-modal");
 const playerGrid     = document.getElementById("player-grid");
 const playerSchedule = document.getElementById("player-schedule");
 const userPillBtn    = document.getElementById("user-pill");
+const matchupsBtn    = document.getElementById("matchups-btn");
 const closeModalBtn  = document.getElementById("close-modal");
 const changeIdentityBtn = document.getElementById("change-identity-btn");
 
@@ -971,9 +968,11 @@ function updateUserPill() {
   if (myName) {
     userPillBtn.textContent = `⛳ ${myName.split(" ")[0]}`;
     userPillBtn.classList.remove("is-unset");
+    if (matchupsBtn) matchupsBtn.disabled = false;
   } else {
     userPillBtn.textContent = "Who are you?";
     userPillBtn.classList.add("is-unset");
+    if (matchupsBtn) matchupsBtn.disabled = true;
   }
 }
 
@@ -1037,6 +1036,12 @@ function openIdentityPicker() {
 userPillBtn.addEventListener("click", () => {
   openIdentityPicker();
 });
+if (matchupsBtn) {
+  matchupsBtn.addEventListener("click", () => {
+    if (!myName) return;
+    openPlayerModal(myName);
+  });
+}
 closeModalBtn.addEventListener("click", closePlayerModal);
 if (changeIdentityBtn) changeIdentityBtn.addEventListener("click", openIdentityPicker);
 playerModal.addEventListener("click", (e) => { if (e.target === playerModal) closePlayerModal(); });
