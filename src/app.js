@@ -844,6 +844,7 @@ const playerGrid     = document.getElementById("player-grid");
 const playerSchedule = document.getElementById("player-schedule");
 const userPillBtn    = document.getElementById("user-pill");
 const closeModalBtn  = document.getElementById("close-modal");
+const changeIdentityBtn = document.getElementById("change-identity-btn");
 
 function renderIdentityScreen() {
   const grid = document.getElementById("identity-player-grid");
@@ -928,16 +929,24 @@ function closePlayerModal() {
   document.body.style.overflow = "";
 }
 
+function openIdentityPicker() {
+  closePlayerModal();
+  const overlay = document.getElementById("identity-overlay");
+  if (!overlay) return;
+  overlay.hidden = false;
+  document.body.style.overflow = "hidden";
+  renderIdentityScreen();
+}
+
 userPillBtn.addEventListener("click", () => {
   if (!myName) {
-    document.getElementById("identity-overlay").hidden = false;
-    document.body.style.overflow = "hidden";
-    renderIdentityScreen();
+    openIdentityPicker();
   } else {
     openPlayerModal(myName);
   }
 });
 closeModalBtn.addEventListener("click", closePlayerModal);
+if (changeIdentityBtn) changeIdentityBtn.addEventListener("click", openIdentityPicker);
 playerModal.addEventListener("click", (e) => { if (e.target === playerModal) closePlayerModal(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closePlayerModal(); closeChat(); } });
 
