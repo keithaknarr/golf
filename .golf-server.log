@@ -20,3 +20,6 @@ Emitted 'error' event on Server instance at:
 }
 
 Node.js v24.14.0
+[2026-08-05 14:43:10] Starting golf app with auto-restart enabled
+[2026-08-05 14:43:10] Launching server
+Golf app running at http://localhost:8000
