@@ -1,11 +1,13 @@
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
-import url from "node:url";
+import url, { pathToFileURL } from "node:url";
 
 const rootDir = process.cwd();
 const port = Number(process.env.PORT) || 8000;
 const baseUrl = `http://localhost:${port}`;
+const stateFile = process.env.GOLF_STATE_FILE || path.join(rootDir, "data", "state.json");
+const healthFile = process.env.GOLF_HEALTH_FILE || path.join(rootDir, "data", "health.json");
 
 const mimeTypes = new Map([
   [".html", "text/html; charset=utf-8"],
@@ -20,8 +22,39 @@ const mimeTypes = new Map([
   [".ico", "image/x-icon"],
 ]);
 
+function ensureStateFile() {
+  fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+  if (!fs.existsSync(stateFile)) {
+    fs.writeFileSync(stateFile, JSON.stringify(null), "utf8");
+  }
+}
+
+function loadStateFromDisk(filePath = stateFile) {
+  try {
+    if (!fs.existsSync(filePath)) return null;
+    const raw = fs.readFileSync(filePath, "utf8");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function persistStateToDisk(state, filePath = stateFile) {
+  try {
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, JSON.stringify(state), "utf8");
+  } catch {}
+}
+
+function writeHealth() {
+  try {
+    fs.mkdirSync(path.dirname(healthFile), { recursive: true });
+    fs.writeFileSync(healthFile, JSON.stringify({ ok: true, ts: Date.now(), port }), "utf8");
+  } catch {}
+}
+
 // In-memory game state shared across all connected clients
-let serverState = null;
+let serverState = loadStateFromDisk();
 const sseClients = new Set();
 
 function broadcastState() {
@@ -44,9 +77,18 @@ const server = http.createServer((request, response) => {
 
   const requestUrl = new url.URL(request.url, baseUrl);
   const { pathname } = requestUrl;
+  const isHead = request.method === "HEAD";
+  const method = isHead ? "GET" : request.method;
+
+  if (pathname === "/health" && method === "GET") {
+    response.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+    if (!isHead) response.end(JSON.stringify({ ok: true, stateFile, port }));
+    else response.end();
+    return;
+  }
 
   // SSE — clients subscribe here for live score updates
-  if (pathname === "/api/events" && request.method === "GET") {
+  if (pathname === "/api/events" && method === "GET") {
     response.writeHead(200, {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
@@ -71,6 +113,7 @@ const server = http.createServer((request, response) => {
         const parsed = JSON.parse(body);
         if (parsed && typeof parsed === "object") {
           serverState = parsed;
+          persistStateToDisk(serverState);
           broadcastState();
           response.writeHead(200, { "Content-Type": "application/json" });
           response.end('{"ok":true}');
@@ -96,11 +139,29 @@ const server = http.createServer((request, response) => {
     const contentType = mimeTypes.get(fileExtension) || "application/octet-stream";
 
     response.writeHead(200, { "Content-Type": contentType });
+    if (isHead) {
+      response.end();
+      return;
+    }
     fs.createReadStream(filePath).pipe(response);
   });
 });
 
-// Bind explicitly to 0.0.0.0 so Codespaces port forwarding picks it up
-server.listen(port, "0.0.0.0", () => {
-  console.log(`Golf app running at ${baseUrl}`);
-});
+function startServer() {
+  ensureStateFile();
+  writeHealth();
+
+  // Bind explicitly to 0.0.0.0 so Codespaces port forwarding picks it up
+  server.listen(port, "0.0.0.0", () => {
+    console.log(`Golf app running at ${baseUrl}`);
+    writeHealth();
+  });
+
+  return server;
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  startServer();
+}
+
+export { loadStateFromDisk, persistStateToDisk, startServer };

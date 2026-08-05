@@ -21,7 +21,12 @@ Use the Team page to enter scores. Use the Leaderboard page to compare teams.
 
 ## Hosting
 
-This app uses a small Node server for live score syncing, so it should be deployed on a host that supports server-side Node.js. A Vercel deployment is configured in `vercel.json`.
+This app uses a small Node server for live score syncing, so it should be deployed on a host that supports server-side Node.js and keeps the process running continuously. The current Render configuration is the recommended path for a 6-day event because it can keep the app online and expose a health endpoint.
+
+For reliable multi-phone access over several days:
+- Use an always-on plan, not a free tier that can sleep or shut down.
+- Keep the app on a single stable public URL.
+- Make sure the server can write to persistent storage for shared state.
 
 ## Files
 
