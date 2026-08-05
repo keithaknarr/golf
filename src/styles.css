@@ -724,7 +724,9 @@ button:disabled {
 .leaderboard tbody tr.is-leader { background: rgba(115, 245, 167, 0.06); }
 
 .col-pos    { width: 36px; text-align: center; font-variant-numeric: tabular-nums; }
-.col-team   { min-width: 170px; font-weight: 600; }
+.col-net    { width: 92px; min-width: 92px; font-variant-numeric: tabular-nums; }
+.col-thru   { width: 74px; min-width: 74px; font-variant-numeric: tabular-nums; }
+.col-team   { min-width: 150px; font-weight: 600; }
 .col-action { text-align: right; }
 
 .leaderboard .enter-scores-btn,
