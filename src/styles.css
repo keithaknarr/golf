@@ -494,6 +494,16 @@ button:disabled {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.scorecard th,
+.scorecard td {
+  padding: 10px 8px;
+}
+
+.scorecard thead th {
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+}
+
 .hole-length,
 .hole-stroke-index {
   color: var(--muted);
@@ -511,8 +521,8 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 64px;
-  padding: 10px 14px;
+  min-width: 48px;
+  padding: 7px 10px;
   border-radius: 999px;
   background: rgba(115, 245, 167, 0.12);
   color: var(--accent);
