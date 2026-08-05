@@ -487,12 +487,21 @@ button:disabled {
 
 .leaderboard th,
 .leaderboard td {
-  padding: 8px 8px;
+  padding: 6px 8px;
 }
 
 .leaderboard thead th {
   font-size: 0.72rem;
   letter-spacing: 0.05em;
+}
+
+.leaderboard tbody td {
+  font-size: 0.9rem;
+}
+
+.leaderboard .col-team {
+  font-size: 0.86rem;
+  line-height: 1.2;
 }
 
 .scorecard thead th {
