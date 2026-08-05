@@ -154,8 +154,15 @@ const server = http.createServer((request, response) => {
 
     const fileExtension = path.extname(filePath).toLowerCase();
     const contentType = mimeTypes.get(fileExtension) || "application/octet-stream";
+    const noStore = fileExtension === ".html" || fileExtension === ".css" || fileExtension === ".js";
+    const headers = {
+      "Content-Type": contentType,
+      "Cache-Control": noStore ? "no-store, no-cache, must-revalidate" : "public, max-age=300",
+      "Pragma": noStore ? "no-cache" : "",
+      "Expires": noStore ? "0" : "",
+    };
 
-    response.writeHead(200, { "Content-Type": contentType });
+    response.writeHead(200, headers);
     if (isHead) {
       response.end();
       return;

@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#08140f" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>MCC Golf 2026</title>
-    <link rel="stylesheet" href="./src/styles.css" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260805a" />
   </head>
   <body>
     <div class="app-shell">
@@ -90,15 +93,14 @@
           </div>
 
           <div class="sc-layout">
-            <section class="subcard">
+            <section class="subcard sc-score-entry">
               <div class="subcard-heading">
                 <div>
-                  <p class="eyebrow">Your team</p>
-                  <h3 id="sc-head-start">Head start: E</h3>
+                  <p class="eyebrow">Entering scores</p>
+                  <h3>Score input</h3>
                 </div>
                 <button class="primary-button" id="save-score-btn" type="button">Save</button>
               </div>
-              <ul class="player-list-ro" id="sc-players"></ul>
               <div class="sc-totals">
                 <article class="summary-card sc-net-card">
                   <span>Net</span>
@@ -125,9 +127,6 @@
                   <strong id="sc-pins-count">0</strong>
                 </article>
               </div>
-            </section>
-
-            <section class="subcard">
               <div class="scorecard-wrap">
                 <table class="scorecard">
                   <thead>
@@ -145,6 +144,19 @@
                 </table>
               </div>
             </section>
+
+            <section class="subcard sc-team-summary">
+              <div class="subcard-heading">
+                <div>
+                  <p class="eyebrow">Team quick view</p>
+                  <h3 id="sc-head-start">Head start: E</h3>
+                </div>
+                <button class="ghost-button" id="sc-team-toggle" type="button" aria-expanded="false">Show details</button>
+              </div>
+              <p class="sc-team-inline" id="sc-team-inline">—</p>
+              <ul class="player-list-ro" id="sc-players" hidden></ul>
+            </section>
+
           </div>
         </section>
       </main>
@@ -166,12 +178,7 @@
     <template id="sc-hole-tpl">
       <tr>
         <td class="score-cell">
-          <div class="score-stepper" role="group" aria-label="Score entry">
-            <button type="button" class="score-btn" data-minus aria-label="Decrease">−</button>
-            <span class="score-display score-display-empty" data-score-display>—</span>
-            <button type="button" class="score-btn score-btn-plus" data-plus aria-label="Increase">+</button>
-            <button type="button" class="score-clear-btn" data-clear aria-label="Clear score">Clr</button>
-          </div>
+          <input type="number" class="score-input" data-score-input min="1" max="12" step="1" inputmode="numeric" aria-label="Score" />
         </td>
         <th scope="row" class="hole-label" data-num></th>
         <td class="hole-length" data-yds></td>
@@ -235,6 +242,6 @@
       </div>
     </div>
 
-    <script src="./src/app.js"></script>
+    <script src="./src/app.js?v=20260805a"></script>
   </body>
 </html>

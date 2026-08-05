@@ -321,6 +321,8 @@ const lbCourseBadge = document.getElementById("lb-course-badge");
 const scRoundLabel  = document.getElementById("sc-round-label");
 const scTitle       = document.getElementById("sc-title");
 const scHeadStart   = document.getElementById("sc-head-start");
+const scTeamInline  = document.getElementById("sc-team-inline");
+const scTeamToggle  = document.getElementById("sc-team-toggle");
 const scPlayers     = document.getElementById("sc-players");
 const scNet   = document.getElementById("sc-net");
 const scGross = document.getElementById("sc-gross");
@@ -332,10 +334,46 @@ const liveDot   = document.getElementById("live-dot");
 const roundTabs = Array.from(document.querySelectorAll("[data-round]"));
 const saveScoreBtn = document.getElementById("save-score-btn");
 const lbPrimaryAction = document.getElementById("lb-primary-action");
+let scorecardTeamDetailsOpen = false;
 
 // --- Render ---
 
+function enforceScorecardSectionOrder() {
+  const layout = viewSC?.querySelector(".sc-layout");
+  if (!layout) return;
+
+  const scoreWrap = layout.querySelector(".scorecard-wrap");
+  const scoreSection = scoreWrap ? scoreWrap.closest(".subcard") : null;
+  const teamList = layout.querySelector("#sc-players");
+  const teamSection = teamList ? teamList.closest(".subcard") : null;
+  const totals = layout.querySelector(".sc-totals");
+  const scoreHeading = scoreSection?.querySelector(".subcard-heading");
+
+  if (scoreSection) {
+    scoreSection.classList.add("sc-score-entry");
+    layout.prepend(scoreSection);
+  }
+
+  if (scoreSection && totals && !scoreSection.contains(totals)) {
+    if (scoreWrap && scoreWrap.parentElement === scoreSection) {
+      scoreSection.insertBefore(totals, scoreWrap);
+    } else {
+      scoreSection.appendChild(totals);
+    }
+  }
+
+  if (scoreSection && saveScoreBtn && scoreHeading && !scoreHeading.contains(saveScoreBtn)) {
+    scoreHeading.appendChild(saveScoreBtn);
+  }
+
+  if (teamSection) {
+    teamSection.classList.add("sc-team-summary");
+    layout.append(teamSection);
+  }
+}
+
 function renderAll() {
+  enforceScorecardSectionOrder();
   const identityOverlay = document.getElementById("identity-overlay");
   if (!myName) {
     identityOverlay.hidden = false;
@@ -537,6 +575,12 @@ function renderScorecardView(round) {
     ? "Individual stroke play"
     : `Head start: ${fmtHeadStart(team.headStart)}`;
 
+  if (scTeamInline) {
+    scTeamInline.textContent = team.players
+      .map((p) => `${p.name.split(" ")[0]} ${p.hcp}`)
+      .join(" | ");
+  }
+
   scPlayers.innerHTML = "";
   for (const p of team.players) {
     const li   = document.createElement("li");
@@ -552,21 +596,36 @@ function renderScorecardView(round) {
     scPlayers.appendChild(li);
   }
 
+  if (scPlayers && scTeamToggle) {
+    scPlayers.hidden = !scorecardTeamDetailsOpen;
+    scTeamToggle.textContent = scorecardTeamDetailsOpen ? "Hide details" : "Show details";
+    scTeamToggle.setAttribute("aria-expanded", scorecardTeamDetailsOpen ? "true" : "false");
+  }
+
   buildScorecardBody(round, team, canEdit);
   updateScorecardTotals(round, team);
 }
 
+if (scTeamToggle && scPlayers) {
+  scTeamToggle.addEventListener("click", () => {
+    scorecardTeamDetailsOpen = !scorecardTeamDetailsOpen;
+    scPlayers.hidden = !scorecardTeamDetailsOpen;
+    scTeamToggle.textContent = scorecardTeamDetailsOpen ? "Hide details" : "Show details";
+    scTeamToggle.setAttribute("aria-expanded", scorecardTeamDetailsOpen ? "true" : "false");
+  });
+}
+
 function updateStepperDisplay(displayEl, resultEl, score, par) {
   if (score === null) {
-    displayEl.textContent = "—";
-    displayEl.className   = "score-display score-display-empty";
+    displayEl.value = "";
+    displayEl.className = "score-input score-input-empty";
     resultEl.textContent  = "";
     resultEl.className    = "result-pill";
   } else {
-    displayEl.textContent = String(score);
+    displayEl.value = String(score);
     const diff = score - par;
     const cls = diff <= -2 ? "eagle" : diff === -1 ? "birdie" : diff === 0 ? "par" : diff === 1 ? "bogey" : "double";
-    displayEl.className  = `score-display score-display-${cls}`;
+    displayEl.className  = `score-input score-input-${cls}`;
     resultEl.textContent = fmtScore(diff);
     applyResultClass(resultEl, diff);
   }
@@ -636,18 +695,11 @@ function buildScorecardBody(round, team, canEdit = true) {
     frag.querySelector("[data-yds]").textContent = course.yards[i] || "";
     frag.querySelector("[data-par]").textContent = String(course.pars[i]);
     frag.querySelector("[data-si]").textContent  = String(course.si[i]);
-    const displayEl = frag.querySelector("[data-score-display]");
-    const minusBtn  = frag.querySelector("[data-minus]");
-    const plusBtn   = frag.querySelector("[data-plus]");
-    const clearBtn  = frag.querySelector("[data-clear]");
+    const displayEl = frag.querySelector("[data-score-input]");
     const resultEl  = frag.querySelector("[data-result]");
 
-    minusBtn.setAttribute("aria-label", `Decrease score for hole ${i + 1}`);
-    plusBtn.setAttribute("aria-label", `Increase score for hole ${i + 1}`);
-    clearBtn.setAttribute("aria-label", `Clear score for hole ${i + 1}`);
-    minusBtn.disabled = !canEdit;
-    plusBtn.disabled = !canEdit;
-    clearBtn.disabled = !canEdit;
+    displayEl.setAttribute("aria-label", `Score for hole ${i + 1}`);
+    displayEl.disabled = !canEdit;
 
     updateStepperDisplay(displayEl, resultEl, parseNumber(holes[i]), course.pars[i]);
 
@@ -661,18 +713,24 @@ function buildScorecardBody(round, team, canEdit = true) {
       setTimeout(() => row.classList.remove("score-updated"), 350);
     };
 
-    minusBtn.addEventListener("click", () => {
-      const curr = parseNumber(state.scores[round.id][team.tee][i]);
-      setScore(curr === null ? course.pars[i] : curr <= 1 ? null : curr - 1);
+    displayEl.addEventListener("input", () => {
+      const raw = displayEl.value.trim();
+      if (raw === "") {
+        setScore(null);
+        return;
+      }
+      const parsed = Number.parseInt(raw, 10);
+      if (Number.isNaN(parsed)) return;
+      setScore(parsed);
     });
 
-    plusBtn.addEventListener("click", () => {
+    displayEl.addEventListener("blur", () => {
       const curr = parseNumber(state.scores[round.id][team.tee][i]);
-      setScore(curr === null ? course.pars[i] : curr + 1);
-    });
-
-    clearBtn.addEventListener("click", () => {
-      setScore(null);
+      if (curr === null) {
+        displayEl.value = "";
+        return;
+      }
+      setScore(curr);
     });
 
     if (round.format === "individual" && course.pars[i] === 3) {
