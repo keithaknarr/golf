@@ -504,6 +504,44 @@ button:disabled {
   letter-spacing: 0.06em;
 }
 
+.scorecard th.col-hole,
+.scorecard td.hole-label {
+  width: 34px;
+  min-width: 34px;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
+}
+
+.scorecard th.col-yds,
+.scorecard td.hole-length {
+  width: 54px;
+  min-width: 54px;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
+}
+
+.scorecard th.col-par,
+.scorecard td.hole-par,
+.scorecard th.col-hc,
+.scorecard td.hole-stroke-index {
+  width: 34px;
+  min-width: 34px;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
+}
+
+.scorecard th.col-diff,
+.scorecard td.result-cell {
+  width: 62px;
+  min-width: 62px;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
+}
+
 .hole-length,
 .hole-stroke-index {
   color: var(--muted);
@@ -521,8 +559,8 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 48px;
-  padding: 7px 10px;
+  min-width: 42px;
+  padding: 6px 8px;
   border-radius: 999px;
   background: rgba(115, 245, 167, 0.12);
   color: var(--accent);
