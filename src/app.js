@@ -473,8 +473,6 @@ function renderLeaderboard(round) {
       badge.textContent = "YOU";
       playersCell.appendChild(badge);
     }
-    frag.querySelector("[data-tee-time]").textContent = team.teeTime;
-
     const hsEl = frag.querySelector("[data-head-start]");
     hsEl.textContent = fmtHeadStart(team.headStart);
     hsEl.className = team.headStart < 0 ? "hs-negative" : "hs-even";

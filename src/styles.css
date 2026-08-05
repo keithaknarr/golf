@@ -481,6 +481,20 @@ button:disabled {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+.leaderboard {
+  min-width: 760px;
+}
+
+.leaderboard th,
+.leaderboard td {
+  padding: 10px 10px;
+}
+
+.leaderboard thead th {
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+}
+
 .scorecard thead th,
 .leaderboard thead th {
   color: var(--muted);
@@ -675,9 +689,15 @@ button:disabled {
 
 .leaderboard tbody tr.is-leader { background: rgba(115, 245, 167, 0.06); }
 
-.col-pos    { width: 42px; text-align: center; font-variant-numeric: tabular-nums; }
-.col-team   { min-width: 180px; font-weight: 600; }
+.col-pos    { width: 36px; text-align: center; font-variant-numeric: tabular-nums; }
+.col-team   { min-width: 170px; font-weight: 600; }
 .col-action { text-align: right; }
+
+.leaderboard .enter-scores-btn,
+.leaderboard .score-lock-pill {
+  font-size: 0.76rem;
+  padding: 6px 10px;
+}
 
 .hs-negative { color: var(--accent); font-weight: 800; }
 .hs-even     { color: var(--muted); }
