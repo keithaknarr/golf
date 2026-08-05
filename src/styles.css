@@ -976,11 +976,17 @@ button:disabled {
 
 /* === Score stepper === */
 
-.scorecard { min-width: 430px; }
+.scorecard {
+  width: max-content;
+  min-width: 430px;
+}
 
 .score-cell {
   padding: 6px 6px !important;
   text-align: left;
+  width: 156px;
+  min-width: 156px;
+  max-width: 156px;
 }
 
 .score-stepper {
