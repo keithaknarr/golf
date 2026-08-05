@@ -1,5 +1,6 @@
 const STORAGE_KEY = "mcc-golf-2026-v1";
 const MY_NAME_KEY  = "mcc-2026-my-name";
+const STATE_VERSION = 2;
 
 function getAppBasePath() {
   try {
@@ -38,26 +39,6 @@ const COURSES = {
 };
 
 const ROUNDS = [
-  {
-    // Individual stroke play — GreyHawk Front 9
-    id: "today", label: "Today", fullLabel: "Today · Individual",
-    format: "individual",
-    course: {
-      name: "GreyHawk Front 9",
-      par: 36,
-      pars:  [4,3,4,5,3,4,5,4,4],
-      yards: [376,167,301,485,154,354,527,346,366],
-      si:    [11,17,13,7,15,9,1,5,3],
-    },
-    teams: [
-      { tee:1, teeTime:"", headStart:0, players:[{name:"Jake",hcp:0}]},
-      { tee:2, teeTime:"", headStart:0, players:[{name:"Michael Pandy",hcp:6}]},
-      { tee:3, teeTime:"", headStart:0, players:[{name:"Keith Knarr",hcp:10}]},
-      { tee:4, teeTime:"", headStart:0, players:[{name:"Ty",hcp:0}]},
-      { tee:5, teeTime:"", headStart:0, players:[{name:"Josh",hcp:0}]},
-      { tee:6, teeTime:"", headStart:0, players:[{name:"Dave",hcp:0}]},
-    ],
-  },
   {
     id: "thu-pm", label: "Thu PM", fullLabel: "Thursday · Afternoon",
     course: COURSES.skytop,
@@ -232,15 +213,25 @@ function normalizeScores(raw) {
 }
 
 function createDefaultState() {
-  return { activeRound: ROUNDS[0].id, activeView: "leaderboard", activeTee: null, scores: emptyScores(), pins: {}, chat: [] };
+  return {
+    version: STATE_VERSION,
+    activeRound: ROUNDS[0].id,
+    activeView: "leaderboard",
+    activeTee: null,
+    scores: emptyScores(),
+    pins: {},
+    chat: [],
+  };
 }
 
 function normalizeState(raw) {
   if (!raw || typeof raw !== "object") return createDefaultState();
+  if (raw.version !== STATE_VERSION) return createDefaultState();
   const activeRound = ROUNDS.find(r => r.id === raw.activeRound)?.id ?? ROUNDS[0].id;
   const round = ROUNDS.find(r => r.id === activeRound);
   const activeTee = round?.teams.some(t => t.tee === raw.activeTee) ? raw.activeTee : null;
   return {
+    version: STATE_VERSION,
     activeRound,
     activeView: activeTee && raw.activeView === "scorecard" ? "scorecard" : "leaderboard",
     activeTee,

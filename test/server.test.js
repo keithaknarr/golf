@@ -9,6 +9,7 @@ test("persists and reloads state from disk", () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "golf-state-"));
   const stateFile = path.join(tmpDir, "state.json");
   const sampleState = {
+    version: 2,
     activeRound: "thu-pm",
     activeView: "leaderboard",
     activeTee: null,

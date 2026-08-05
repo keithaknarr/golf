@@ -8,6 +8,7 @@ const port = Number(process.env.PORT) || 8000;
 const baseUrl = `http://localhost:${port}`;
 const stateFile = process.env.GOLF_STATE_FILE || path.join(rootDir, "data", "state.json");
 const healthFile = process.env.GOLF_HEALTH_FILE || path.join(rootDir, "data", "health.json");
+const STATE_VERSION = 2;
 
 const mimeTypes = new Map([
   [".html", "text/html; charset=utf-8"],
@@ -33,7 +34,10 @@ function loadStateFromDisk(filePath = stateFile) {
   try {
     if (!fs.existsSync(filePath)) return null;
     const raw = fs.readFileSync(filePath, "utf8");
-    return raw ? JSON.parse(raw) : null;
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (!parsed || typeof parsed !== "object") return null;
+    if (parsed.version !== STATE_VERSION) return null;
+    return parsed;
   } catch {
     return null;
   }
@@ -112,6 +116,11 @@ const server = http.createServer((request, response) => {
       try {
         const parsed = JSON.parse(body);
         if (parsed && typeof parsed === "object") {
+          if (parsed.version !== STATE_VERSION) {
+            response.writeHead(409, { "Content-Type": "application/json" });
+            response.end('{"ok":false,"reason":"stale-client"}');
+            return;
+          }
           serverState = parsed;
           persistStateToDisk(serverState);
           broadcastState();
