@@ -1370,9 +1370,17 @@ table.scorecard.has-pins .pin-col { display: table-cell; }
 }
 
 .pin-picker {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4px;
+  max-height: 132px;
+  min-width: 172px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 2px;
+  align-content: start;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .pin-player-btn {
@@ -1385,6 +1393,14 @@ table.scorecard.has-pins .pin-col { display: table-cell; }
   cursor: pointer;
   font-family: inherit;
   transition: background 0.1s;
+}
+
+@media (max-width: 680px) {
+  .pin-picker {
+    grid-template-columns: 1fr;
+    max-height: 168px;
+    min-width: 138px;
+  }
 }
 
 .pin-player-btn.is-selected {
