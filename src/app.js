@@ -644,13 +644,27 @@ function updateStepperDisplay(displayEl, resultEl, score, par) {
   }
 }
 
+function playersInRound(round) {
+  const names = [];
+  const seen = new Set();
+  for (const t of round.teams) {
+    for (const p of t.players) {
+      if (!seen.has(p.name)) {
+        seen.add(p.name);
+        names.push(p.name);
+      }
+    }
+  }
+  return names;
+}
+
 function renderPinCell(cell, round, holeIdx, team) {
   cell.innerHTML = "";
   const winner = state.pins[round.id]?.[holeIdx] || null;
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = winner ? "pin-winner-btn" : "pin-picker-btn";
-  btn.textContent = winner ? `📍 ${winner.split(" ")[0]}` : "📍";
+  btn.textContent = winner ? `Beat it: ${winner.split(" ")[0]}` : "Beat it";
   btn.addEventListener("click", () => openPinPicker(cell, round, holeIdx, team, winner));
   cell.appendChild(btn);
 }
@@ -659,14 +673,13 @@ function openPinPicker(cell, round, holeIdx, team, currentWinner) {
   cell.innerHTML = "";
   const wrap = document.createElement("div");
   wrap.className = "pin-picker";
-  for (const t of round.teams) {
-    const p = t.players[0];
+  for (const name of playersInRound(round)) {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "pin-player-btn" + (p.name === currentWinner ? " is-selected" : "");
-    btn.textContent = p.name.split(" ")[0];
+    btn.className = "pin-player-btn" + (name === currentWinner ? " is-selected" : "");
+    btn.textContent = name.split(" ")[0];
     btn.addEventListener("click", () => {
-      const next = p.name === currentWinner ? null : p.name;
+      const next = name === currentWinner ? null : name;
       if (!state.pins[round.id]) state.pins[round.id] = {};
       if (next === null) delete state.pins[round.id][holeIdx];
       else state.pins[round.id][holeIdx] = next;
@@ -684,7 +697,7 @@ function buildScorecardBody(round, team, canEdit = true) {
   const holeCount = holeCountForCourse(course);
   const holes  = state.scores[round.id][team.tee];
   scBody.innerHTML = "";
-  scBody.closest("table").classList.toggle("has-pins", round.format === "individual");
+  scBody.closest("table").classList.toggle("has-pins", course.pars.includes(3));
 
   const addSubRow = (label, start, end) => {
     const frag = scSubTpl.content.cloneNode(true);
@@ -747,12 +760,12 @@ function buildScorecardBody(round, team, canEdit = true) {
       setScore(curr);
     });
 
-    if (round.format === "individual" && course.pars[i] === 3) {
+    if (course.pars[i] === 3) {
       const pinCell = frag.querySelector("[data-pin-cell]");
       if (pinCell && canEdit) renderPinCell(pinCell, round, i, team);
       if (pinCell && !canEdit) {
         const winner = state.pins[round.id]?.[i] || null;
-        pinCell.textContent = winner ? `📍 ${winner.split(" ")[0]}` : "";
+        pinCell.textContent = winner ? `Beat it: ${winner.split(" ")[0]}` : "";
       }
     }
     scBody.appendChild(frag);
@@ -815,9 +828,11 @@ function updateScorecardTotals(round, team) {
   }
   const pinCard = document.getElementById("sc-pins");
   if (pinCard) {
-    pinCard.hidden = round.format !== "individual";
-    if (round.format === "individual") {
-      const myPins = Object.values(state.pins[round.id] || {}).filter(p => p === team.players[0].name).length;
+    const hasPar3 = round.course.pars.includes(3);
+    pinCard.hidden = !hasPar3;
+    if (hasPar3) {
+      const teamNames = new Set(team.players.map((p) => p.name));
+      const myPins = Object.values(state.pins[round.id] || {}).filter((p) => teamNames.has(p)).length;
       document.getElementById("sc-pins-count").textContent = String(myPins);
     }
   }
