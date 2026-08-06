@@ -48,7 +48,7 @@ const ROUNDS = [
         {name:"Bob Knapp",hcp:11},{name:"Cisco",hcp:14}]},
       { tee:2, teeTime:"1:09 PM", headStart:-5, players:[
         {name:"Lloyd Doehr",hcp:12},{name:"Claudia Kundrod",hcp:15},
-        {name:"Eric Price",hcp:16},{name:"Ben Doehr",hcp:17}]},
+        {name:"Eric Price",hcp:16},{name:"Ben",hcp:17}]},
       { tee:3, teeTime:"1:18 PM", headStart:-1, players:[
         {name:"Michael Pandy",hcp:6},{name:"Donny Galvin",hcp:7},
         {name:"Keith Knarr",hcp:10},{name:"Ken Kisel",hcp:12}]},
@@ -81,7 +81,7 @@ const ROUNDS = [
         {name:"Larry Graham",hcp:10},{name:"Betty Abraham",hcp:13}]},
       { tee:5, teeTime:"8:39 AM", headStart:-1, players:[
         {name:"Michael Pandy",hcp:6},{name:"Ryan Reynolds",hcp:8.5},
-        {name:"Eric Price",hcp:16},{name:"Ben Doehr",hcp:17}]},
+        {name:"Eric Price",hcp:16},{name:"Ben",hcp:17}]},
       { tee:6, teeTime:"8:48 AM", headStart:-2, players:[
         {name:"Drew Havanchak",hcp:8},{name:"Ricky Kundrod",hcp:10},
         {name:"Cisco",hcp:14},{name:"Claudia Kundrod",hcp:15}]},
@@ -108,7 +108,7 @@ const ROUNDS = [
         {name:"David McCluskey",hcp:10},{name:"Ricky Kundrod",hcp:10}]},
       { tee:6, teeTime:"2:12 PM", headStart:-2, players:[
         {name:"Drew Havanchak",hcp:8},{name:"Bob Knapp",hcp:11},
-        {name:"Matt Walker",hcp:12},{name:"Ben Doehr",hcp:17}]},
+        {name:"Matt Walker",hcp:12},{name:"Ben",hcp:17}]},
     ],
   },
   {
@@ -126,7 +126,7 @@ const ROUNDS = [
         {name:"Drew Havanchak",hcp:8},{name:"Lloyd Doehr",hcp:12}]},
       { tee:4, teeTime:"8:21 AM", headStart:-4, players:[
         {name:"David McCluskey",hcp:10},{name:"Ken Kisel",hcp:12},
-        {name:"Claudia Kundrod",hcp:15},{name:"Ben Doehr",hcp:17}]},
+        {name:"Claudia Kundrod",hcp:15},{name:"Ben",hcp:17}]},
       { tee:5, teeTime:"8:30 AM", headStart:-1, players:[
         {name:"Zeke Overy",hcp:6},{name:"Larry Graham",hcp:10},
         {name:"Keith Knarr",hcp:10},{name:"Bob Knapp",hcp:11}]},
@@ -147,7 +147,7 @@ const ROUNDS = [
         {name:"Nevin Greenfield",hcp:7},{name:"Eric Price",hcp:16}]},
       { tee:3, teeTime:"1:54 PM", headStart:-1, players:[
         {name:"Chris Varady",hcp:4},{name:"Keith Knarr",hcp:10},
-        {name:"Cisco",hcp:14},{name:"Ben Doehr",hcp:17}]},
+        {name:"Cisco",hcp:14},{name:"Ben",hcp:17}]},
       { tee:4, teeTime:"2:03 PM", headStart:-2, players:[
         {name:"Ryan Reynolds",hcp:8.5},{name:"Bob Knapp",hcp:11},
         {name:"Betty Abraham",hcp:13},{name:"Claudia Kundrod",hcp:15}]},
