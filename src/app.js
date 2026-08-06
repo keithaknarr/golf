@@ -45,22 +45,22 @@ const ROUNDS = [
     teams: [
       { tee:1, teeTime:"1:00 PM", headStart:-2, players:[
         {name:"Mike Johnson",hcp:9},{name:"David McCluskey",hcp:10},
-        {name:"Bob Knapp",hcp:11},{name:"Cisco",hcp:14}]},
+        {name:"Jap",hcp:11},{name:"Cisco",hcp:14}]},
       { tee:2, teeTime:"1:09 PM", headStart:-5, players:[
-        {name:"Lloyd Doehr",hcp:12},{name:"Claudia Kundrod",hcp:15},
+        {name:"Lloyd Doehr",hcp:12},{name:"Claudia",hcp:15},
         {name:"Eric Price",hcp:16},{name:"Ben",hcp:17}]},
       { tee:3, teeTime:"1:18 PM", headStart:-1, players:[
-        {name:"Michael Pandy",hcp:6},{name:"Donny Galvin",hcp:7},
-        {name:"Keith Knarr",hcp:10},{name:"Ken Kisel",hcp:12}]},
+        {name:"Pandy",hcp:6},{name:"Donny",hcp:7},
+        {name:"Keith Knarr",hcp:10},{name:"Kisel",hcp:12}]},
       { tee:4, teeTime:"1:27 PM", headStart:-5, players:[
-        {name:"Betty Abraham",hcp:13},{name:"Jay Wieland",hcp:13},
-        {name:"Josh Meyer",hcp:14},{name:"Bob Sarka",hcp:18}]},
+        {name:"Betty Abraham",hcp:13},{name:"Jay",hcp:13},
+        {name:"Josh",hcp:14},{name:"Sarka",hcp:18}]},
       { tee:5, teeTime:"1:36 PM", headStart:0, players:[
-        {name:"Chris Varady",hcp:4},{name:"Zeke Overy",hcp:6},
-        {name:"Ricky Kundrod",hcp:10},{name:"Matt Walker",hcp:12}]},
+        {name:"Chris Varady",hcp:4},{name:"Zeke",hcp:6},
+        {name:"Ricky",hcp:10},{name:"Matt",hcp:12}]},
       { tee:6, teeTime:"1:45 PM", headStart:-1, players:[
-        {name:"Nevin Greenfield",hcp:7},{name:"Drew Havanchak",hcp:8},
-        {name:"Ryan Reynolds",hcp:8.5},{name:"Larry Graham",hcp:10}]},
+        {name:"Nevin",hcp:7},{name:"Drew",hcp:8},
+        {name:"Ryan Reynolds",hcp:8.5},{name:"Larry",hcp:10}]},
     ],
   },
   {
@@ -69,22 +69,22 @@ const ROUNDS = [
     teams: [
       { tee:1, teeTime:"8:03 AM", headStart:-2, players:[
         {name:"Keith Knarr",hcp:10},{name:"David McCluskey",hcp:10},
-        {name:"Matt Walker",hcp:12},{name:"Jay Wieland",hcp:13}]},
+        {name:"Matt",hcp:12},{name:"Jay",hcp:13}]},
       { tee:2, teeTime:"8:12 AM", headStart:-1, players:[
-        {name:"Zeke Overy",hcp:6},{name:"Lloyd Doehr",hcp:12},
-        {name:"Ken Kisel",hcp:12},{name:"Josh Meyer",hcp:14}]},
+        {name:"Zeke",hcp:6},{name:"Lloyd Doehr",hcp:12},
+        {name:"Kisel",hcp:12},{name:"Josh",hcp:14}]},
       { tee:3, teeTime:"8:21 AM", headStart:0, players:[
-        {name:"Chris Varady",hcp:4},{name:"Nevin Greenfield",hcp:7},
-        {name:"Bob Knapp",hcp:11},{name:"Bob Sarka",hcp:18}]},
+        {name:"Chris Varady",hcp:4},{name:"Nevin",hcp:7},
+        {name:"Jap",hcp:11},{name:"Sarka",hcp:18}]},
       { tee:4, teeTime:"8:30 AM", headStart:0, players:[
-        {name:"Donny Galvin",hcp:7},{name:"Mike Johnson",hcp:9},
-        {name:"Larry Graham",hcp:10},{name:"Betty Abraham",hcp:13}]},
+        {name:"Donny",hcp:7},{name:"Mike Johnson",hcp:9},
+        {name:"Larry",hcp:10},{name:"Betty Abraham",hcp:13}]},
       { tee:5, teeTime:"8:39 AM", headStart:-1, players:[
-        {name:"Michael Pandy",hcp:6},{name:"Ryan Reynolds",hcp:8.5},
+        {name:"Pandy",hcp:6},{name:"Ryan Reynolds",hcp:8.5},
         {name:"Eric Price",hcp:16},{name:"Ben",hcp:17}]},
       { tee:6, teeTime:"8:48 AM", headStart:-2, players:[
-        {name:"Drew Havanchak",hcp:8},{name:"Ricky Kundrod",hcp:10},
-        {name:"Cisco",hcp:14},{name:"Claudia Kundrod",hcp:15}]},
+        {name:"Drew",hcp:8},{name:"Ricky",hcp:10},
+        {name:"Cisco",hcp:14},{name:"Claudia",hcp:15}]},
     ],
   },
   {
@@ -92,23 +92,23 @@ const ROUNDS = [
     course: COURSES.mountainView,
     teams: [
       { tee:1, teeTime:"1:27 PM", headStart:0, players:[
-        {name:"Nevin Greenfield",hcp:7},{name:"Mike Johnson",hcp:9},
+        {name:"Nevin",hcp:7},{name:"Mike Johnson",hcp:9},
         {name:"Keith Knarr",hcp:10},{name:"Lloyd Doehr",hcp:12}]},
       { tee:2, teeTime:"1:36 PM", headStart:0, players:[
-        {name:"Chris Varady",hcp:4},{name:"Larry Graham",hcp:10},
-        {name:"Jay Wieland",hcp:13},{name:"Josh Meyer",hcp:14}]},
+        {name:"Chris Varady",hcp:4},{name:"Larry",hcp:10},
+        {name:"Jay",hcp:13},{name:"Josh",hcp:14}]},
       { tee:3, teeTime:"1:45 PM", headStart:-3, players:[
-        {name:"Ken Kisel",hcp:12},{name:"Betty Abraham",hcp:13},
+        {name:"Kisel",hcp:12},{name:"Betty Abraham",hcp:13},
         {name:"Cisco",hcp:14},{name:"Eric Price",hcp:16}]},
       { tee:4, teeTime:"1:54 PM", headStart:-1, players:[
-        {name:"Zeke Overy",hcp:6},{name:"Michael Pandy",hcp:6},
-        {name:"Claudia Kundrod",hcp:15},{name:"Bob Sarka",hcp:18}]},
+        {name:"Zeke",hcp:6},{name:"Pandy",hcp:6},
+        {name:"Claudia",hcp:15},{name:"Sarka",hcp:18}]},
       { tee:5, teeTime:"2:03 PM", headStart:0, players:[
-        {name:"Donny Galvin",hcp:7},{name:"Ryan Reynolds",hcp:8.5},
-        {name:"David McCluskey",hcp:10},{name:"Ricky Kundrod",hcp:10}]},
+        {name:"Donny",hcp:7},{name:"Ryan Reynolds",hcp:8.5},
+        {name:"David McCluskey",hcp:10},{name:"Ricky",hcp:10}]},
       { tee:6, teeTime:"2:12 PM", headStart:-2, players:[
-        {name:"Drew Havanchak",hcp:8},{name:"Bob Knapp",hcp:11},
-        {name:"Matt Walker",hcp:12},{name:"Ben",hcp:17}]},
+        {name:"Drew",hcp:8},{name:"Jap",hcp:11},
+        {name:"Matt",hcp:12},{name:"Ben",hcp:17}]},
     ],
   },
   {
@@ -116,23 +116,23 @@ const ROUNDS = [
     course: COURSES.mountainView,
     teams: [
       { tee:1, teeTime:"7:54 AM", headStart:-1, players:[
-        {name:"Michael Pandy",hcp:6},{name:"Nevin Greenfield",hcp:7},
-        {name:"Ricky Kundrod",hcp:10},{name:"Betty Abraham",hcp:13}]},
+        {name:"Pandy",hcp:6},{name:"Nevin",hcp:7},
+        {name:"Ricky",hcp:10},{name:"Betty Abraham",hcp:13}]},
       { tee:2, teeTime:"8:03 AM", headStart:-4, players:[
-        {name:"Mike Johnson",hcp:9},{name:"Matt Walker",hcp:12},
-        {name:"Josh Meyer",hcp:14},{name:"Eric Price",hcp:16}]},
+        {name:"Mike Johnson",hcp:9},{name:"Matt",hcp:12},
+        {name:"Josh",hcp:14},{name:"Eric Price",hcp:16}]},
       { tee:3, teeTime:"8:12 AM", headStart:0, players:[
-        {name:"Chris Varady",hcp:4},{name:"Donny Galvin",hcp:7},
-        {name:"Drew Havanchak",hcp:8},{name:"Lloyd Doehr",hcp:12}]},
+        {name:"Chris Varady",hcp:4},{name:"Donny",hcp:7},
+        {name:"Drew",hcp:8},{name:"Lloyd Doehr",hcp:12}]},
       { tee:4, teeTime:"8:21 AM", headStart:-4, players:[
-        {name:"David McCluskey",hcp:10},{name:"Ken Kisel",hcp:12},
-        {name:"Claudia Kundrod",hcp:15},{name:"Ben",hcp:17}]},
+        {name:"David McCluskey",hcp:10},{name:"Kisel",hcp:12},
+        {name:"Claudia",hcp:15},{name:"Ben",hcp:17}]},
       { tee:5, teeTime:"8:30 AM", headStart:-1, players:[
-        {name:"Zeke Overy",hcp:6},{name:"Larry Graham",hcp:10},
-        {name:"Keith Knarr",hcp:10},{name:"Bob Knapp",hcp:11}]},
+        {name:"Zeke",hcp:6},{name:"Larry",hcp:10},
+        {name:"Keith Knarr",hcp:10},{name:"Jap",hcp:11}]},
       { tee:6, teeTime:"8:39 AM", headStart:-4, players:[
-        {name:"Ryan Reynolds",hcp:8.5},{name:"Jay Wieland",hcp:13},
-        {name:"Cisco",hcp:14},{name:"Bob Sarka",hcp:18}]},
+        {name:"Ryan Reynolds",hcp:8.5},{name:"Jay",hcp:13},
+        {name:"Cisco",hcp:14},{name:"Sarka",hcp:18}]},
     ],
   },
   {
@@ -140,23 +140,23 @@ const ROUNDS = [
     course: COURSES.mountainView,
     teams: [
       { tee:1, teeTime:"1:36 PM", headStart:0, players:[
-        {name:"Michael Pandy",hcp:6},{name:"Drew Havanchak",hcp:8},
-        {name:"David McCluskey",hcp:10},{name:"Josh Meyer",hcp:14}]},
+        {name:"Pandy",hcp:6},{name:"Drew",hcp:8},
+        {name:"David McCluskey",hcp:10},{name:"Josh",hcp:14}]},
       { tee:2, teeTime:"1:45 PM", headStart:0, players:[
-        {name:"Zeke Overy",hcp:6},{name:"Donny Galvin",hcp:7},
-        {name:"Nevin Greenfield",hcp:7},{name:"Eric Price",hcp:16}]},
+        {name:"Zeke",hcp:6},{name:"Donny",hcp:7},
+        {name:"Nevin",hcp:7},{name:"Eric Price",hcp:16}]},
       { tee:3, teeTime:"1:54 PM", headStart:-1, players:[
         {name:"Chris Varady",hcp:4},{name:"Keith Knarr",hcp:10},
         {name:"Cisco",hcp:14},{name:"Ben",hcp:17}]},
       { tee:4, teeTime:"2:03 PM", headStart:-2, players:[
-        {name:"Ryan Reynolds",hcp:8.5},{name:"Bob Knapp",hcp:11},
-        {name:"Betty Abraham",hcp:13},{name:"Claudia Kundrod",hcp:15}]},
+        {name:"Ryan Reynolds",hcp:8.5},{name:"Jap",hcp:11},
+        {name:"Betty Abraham",hcp:13},{name:"Claudia",hcp:15}]},
       { tee:5, teeTime:"2:12 PM", headStart:-2, players:[
-        {name:"Mike Johnson",hcp:9},{name:"Ricky Kundrod",hcp:10},
-        {name:"Ken Kisel",hcp:12},{name:"Jay Wieland",hcp:13}]},
+        {name:"Mike Johnson",hcp:9},{name:"Ricky",hcp:10},
+        {name:"Kisel",hcp:12},{name:"Jay",hcp:13}]},
       { tee:6, teeTime:"2:21 PM", headStart:-3, players:[
-        {name:"Larry Graham",hcp:10},{name:"Lloyd Doehr",hcp:12},
-        {name:"Matt Walker",hcp:12},{name:"Bob Sarka",hcp:18}]},
+        {name:"Larry",hcp:10},{name:"Lloyd Doehr",hcp:12},
+        {name:"Matt",hcp:12},{name:"Sarka",hcp:18}]},
     ],
   },
 ];
@@ -1019,7 +1019,8 @@ function openPlayerModal(selectedName = null) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "player-select-btn" + (name === selectedName ? " is-selected" : "");
-    btn.textContent = name.split(" ")[0] + " " + name.split(" ")[1]?.[0] + ".";
+    const parts = name.split(" ");
+    btn.textContent = parts.length > 1 ? `${parts[0]} ${parts[1][0]}.` : parts[0];
     btn.addEventListener("click", () => showPlayerSchedule(name));
     playerGrid.appendChild(btn);
   }
