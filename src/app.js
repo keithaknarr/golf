@@ -336,6 +336,7 @@ const saveScoreBtn = document.getElementById("save-score-btn");
 const lbPrimaryAction = document.getElementById("lb-primary-action");
 let scorecardTeamDetailsOpen = false;
 let saveFeedbackTimer = null;
+let activePinPicker = null;
 
 function showSaveFeedback(label = "Saved") {
   if (!saveScoreBtn) return;
@@ -665,7 +666,11 @@ function renderPinCell(cell, round, holeIdx, team) {
   btn.type = "button";
   btn.className = winner ? "pin-winner-btn" : "pin-picker-btn";
   btn.textContent = winner ? `Beat it: ${winner.split(" ")[0]}` : "Beat it";
-  btn.addEventListener("click", () => openPinPicker(cell, round, holeIdx, team, winner));
+  btn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    activePinPicker = { roundId: round.id, tee: team.tee, holeIdx };
+    openPinPicker(cell, round, holeIdx, team, winner);
+  });
   cell.appendChild(btn);
 }
 
@@ -683,6 +688,7 @@ function openPinPicker(cell, round, holeIdx, team, currentWinner) {
       if (!state.pins[round.id]) state.pins[round.id] = {};
       if (next === null) delete state.pins[round.id][holeIdx];
       else state.pins[round.id][holeIdx] = next;
+      activePinPicker = null;
       saveState();
       renderPinCell(cell, round, holeIdx, team);
       updateScorecardTotals(round, team);
@@ -762,7 +768,17 @@ function buildScorecardBody(round, team, canEdit = true) {
 
     if (course.pars[i] === 3) {
       const pinCell = frag.querySelector("[data-pin-cell]");
-      if (pinCell && canEdit) renderPinCell(pinCell, round, i, team);
+      if (pinCell && canEdit) {
+        renderPinCell(pinCell, round, i, team);
+        const isActivePicker = activePinPicker
+          && activePinPicker.roundId === round.id
+          && activePinPicker.tee === team.tee
+          && activePinPicker.holeIdx === i;
+        if (isActivePicker) {
+          const winner = state.pins[round.id]?.[i] || null;
+          openPinPicker(pinCell, round, i, team, winner);
+        }
+      }
       if (pinCell && !canEdit) {
         const winner = state.pins[round.id]?.[i] || null;
         pinCell.textContent = winner ? `Beat it: ${winner.split(" ")[0]}` : "";
@@ -865,6 +881,7 @@ if (saveScoreBtn) {
 
 roundTabs.forEach(btn => {
   btn.addEventListener("click", () => {
+    activePinPicker = null;
     state.activeRound = btn.dataset.round;
     state.activeView  = "leaderboard";
     state.activeTee   = null;
@@ -1066,6 +1083,12 @@ closeModalBtn.addEventListener("click", closePlayerModal);
 if (changeIdentityBtn) changeIdentityBtn.addEventListener("click", openIdentityPicker);
 playerModal.addEventListener("click", (e) => { if (e.target === playerModal) closePlayerModal(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closePlayerModal(); closeChat(); } });
+document.addEventListener("click", (event) => {
+  if (!activePinPicker) return;
+  if (event.target instanceof Element && event.target.closest(".pin-col")) return;
+  activePinPicker = null;
+  renderAll();
+});
 
 // --- Chat ---
 
