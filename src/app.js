@@ -51,7 +51,7 @@ const ROUNDS = [
         {name:"Eric",hcp:16},{name:"Ben",hcp:17}]},
       { tee:3, teeTime:"1:18 PM", headStart:-1, players:[
         {name:"Pandy",hcp:6},{name:"Donny",hcp:7},
-        {name:"Keith Knarr",hcp:10},{name:"Kisel",hcp:12}]},
+        {name:"Keith",hcp:10},{name:"Kisel",hcp:12}]},
       { tee:4, teeTime:"1:27 PM", headStart:-5, players:[
         {name:"Betty",hcp:13},{name:"Jay",hcp:13},
         {name:"Josh",hcp:14},{name:"Sarka",hcp:18}]},
@@ -68,7 +68,7 @@ const ROUNDS = [
     course: COURSES.mountainView,
     teams: [
       { tee:1, teeTime:"8:03 AM", headStart:-2, players:[
-        {name:"Keith Knarr",hcp:10},{name:"Dave RN",hcp:10},
+        {name:"Keith",hcp:10},{name:"Dave RN",hcp:10},
         {name:"Matt",hcp:12},{name:"Jay",hcp:13}]},
       { tee:2, teeTime:"8:12 AM", headStart:-1, players:[
         {name:"Zeke",hcp:6},{name:"Lloyd",hcp:12},
@@ -93,7 +93,7 @@ const ROUNDS = [
     teams: [
       { tee:1, teeTime:"1:27 PM", headStart:0, players:[
         {name:"Nevin",hcp:7},{name:"Mike",hcp:9},
-        {name:"Keith Knarr",hcp:10},{name:"Lloyd",hcp:12}]},
+        {name:"Keith",hcp:10},{name:"Lloyd",hcp:12}]},
       { tee:2, teeTime:"1:36 PM", headStart:0, players:[
         {name:"Chris",hcp:4},{name:"Larry",hcp:10},
         {name:"Jay",hcp:13},{name:"Josh",hcp:14}]},
@@ -129,7 +129,7 @@ const ROUNDS = [
         {name:"Claudia",hcp:15},{name:"Ben",hcp:17}]},
       { tee:5, teeTime:"8:30 AM", headStart:-1, players:[
         {name:"Zeke",hcp:6},{name:"Larry",hcp:10},
-        {name:"Keith Knarr",hcp:10},{name:"Jap",hcp:11}]},
+        {name:"Keith",hcp:10},{name:"Jap",hcp:11}]},
       { tee:6, teeTime:"8:39 AM", headStart:-4, players:[
         {name:"Ryan",hcp:8.5},{name:"Jay",hcp:13},
         {name:"Cisco",hcp:14},{name:"Sarka",hcp:18}]},
@@ -146,7 +146,7 @@ const ROUNDS = [
         {name:"Zeke",hcp:6},{name:"Donny",hcp:7},
         {name:"Nevin",hcp:7},{name:"Eric",hcp:16}]},
       { tee:3, teeTime:"1:54 PM", headStart:-1, players:[
-        {name:"Chris",hcp:4},{name:"Keith Knarr",hcp:10},
+        {name:"Chris",hcp:4},{name:"Keith",hcp:10},
         {name:"Cisco",hcp:14},{name:"Ben",hcp:17}]},
       { tee:4, teeTime:"2:03 PM", headStart:-2, players:[
         {name:"Ryan",hcp:8.5},{name:"Jap",hcp:11},
@@ -976,6 +976,14 @@ const matchupsBtn    = document.getElementById("matchups-btn");
 const closeModalBtn  = document.getElementById("close-modal");
 const changeIdentityBtn = document.getElementById("change-identity-btn");
 
+function formatSelectorName(name) {
+  const parts = name.split(" ");
+  if (parts.length === 1) return parts[0];
+  const second = parts[1] || "";
+  if (parts.length === 2 && second.length <= 2) return `${parts[0]} ${second}`;
+  return `${parts[0]} ${second[0]}.`;
+}
+
 function renderIdentityScreen() {
   const grid = document.getElementById("identity-player-grid");
   if (!grid) return;
@@ -984,8 +992,7 @@ function renderIdentityScreen() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "identity-player-btn";
-    const parts = name.split(" ");
-    btn.textContent = parts.length > 1 ? `${parts[0]} ${parts[1][0]}.` : parts[0];
+    btn.textContent = formatSelectorName(name);
     btn.addEventListener("click", () => selectIdentity(name));
     grid.appendChild(btn);
   }
@@ -1019,8 +1026,7 @@ function openPlayerModal(selectedName = null) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "player-select-btn" + (name === selectedName ? " is-selected" : "");
-    const parts = name.split(" ");
-    btn.textContent = parts.length > 1 ? `${parts[0]} ${parts[1][0]}.` : parts[0];
+    btn.textContent = formatSelectorName(name);
     btn.addEventListener("click", () => showPlayerSchedule(name));
     playerGrid.appendChild(btn);
   }
