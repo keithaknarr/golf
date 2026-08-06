@@ -1346,7 +1346,11 @@ tr.score-updated td, tr.score-updated th {
 
 /* === Pin tracker === */
 
-.pin-col { display: none; }
+.pin-col {
+  display: none;
+  position: relative;
+  overflow: visible;
+}
 table.scorecard.has-pins .pin-col { display: table-cell; }
 
 .pin-picker-btn, .pin-winner-btn {
@@ -1370,15 +1374,25 @@ table.scorecard.has-pins .pin-col { display: table-cell; }
 }
 
 .pin-picker {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4px;
-  max-height: 132px;
-  min-width: 172px;
+  max-height: 156px;
+  min-width: 188px;
+  max-width: min(76vw, 240px);
   overflow-y: auto;
   overflow-x: hidden;
+  padding: 6px;
   padding-right: 2px;
   align-content: start;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(8,20,15,0.96);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35);
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
 }
@@ -1398,8 +1412,9 @@ table.scorecard.has-pins .pin-col { display: table-cell; }
 @media (max-width: 680px) {
   .pin-picker {
     grid-template-columns: 1fr;
-    max-height: 168px;
-    min-width: 138px;
+    max-height: 184px;
+    min-width: 148px;
+    max-width: min(70vw, 220px);
   }
 }
 
