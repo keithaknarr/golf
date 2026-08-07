@@ -61,6 +61,29 @@ function writeHealth() {
 let serverState = loadStateFromDisk();
 const sseClients = new Set();
 
+// Never let an incoming empty hole overwrite a recorded score
+function mergeScores(base, incoming) {
+  if (!base) return incoming;
+  if (!incoming) return base;
+  const merged = {};
+  const roundIds = new Set([...Object.keys(base), ...Object.keys(incoming)]);
+  for (const rid of roundIds) {
+    merged[rid] = {};
+    const tees = new Set([...Object.keys(base[rid] || {}), ...Object.keys(incoming[rid] || {})]);
+    for (const tee of tees) {
+      const b = base[rid]?.[tee] ?? [];
+      const inc = incoming[rid]?.[tee] ?? [];
+      const len = Math.max(b.length, inc.length);
+      merged[rid][tee] = Array.from({ length: len }, (_, i) => {
+        const iv = (inc[i] == null || inc[i] === "") ? "" : String(inc[i]);
+        const bv = (b[i]  == null || b[i]  === "") ? "" : String(b[i]);
+        return iv !== "" ? iv : bv;
+      });
+    }
+  }
+  return merged;
+}
+
 function broadcastState() {
   const payload = `data: ${JSON.stringify(serverState)}\n\n`;
   for (const res of sseClients) res.write(payload);
@@ -134,7 +157,16 @@ const server = http.createServer((request, response) => {
             response.end('{"ok":false,"reason":"stale-client"}');
             return;
           }
-          serverState = parsed;
+          serverState = {
+            ...parsed,
+            scores: mergeScores(serverState?.scores, parsed.scores),
+            pins: { ...(serverState?.pins || {}), ...(parsed.pins || {}) },
+            chat: (() => {
+              const ids = new Set((serverState?.chat || []).map(m => m.id));
+              const fresh = (parsed.chat || []).filter(m => !ids.has(m.id));
+              return [...(serverState?.chat || []), ...fresh].sort((a, b) => a.ts - b.ts).slice(-100);
+            })(),
+          };
           persistStateToDisk(serverState);
           broadcastState();
           response.writeHead(200, { "Content-Type": "application/json" });
