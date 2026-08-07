@@ -1414,6 +1414,11 @@ table.scorecard.has-pins .pin-col { display: table-cell; }
   touch-action: pan-y;
 }
 
+.pin-picker.pin-picker-up {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
 .pin-player-btn {
   padding: 5px 8px;
   border-radius: 999px;

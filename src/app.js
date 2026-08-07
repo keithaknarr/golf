@@ -714,6 +714,16 @@ function openPinPicker(cell, round, holeIdx, team, currentWinner) {
     wrap.appendChild(btn);
   }
   cell.appendChild(wrap);
+
+  const placePinPicker = () => {
+    wrap.classList.remove("pin-picker-up");
+    const rect = wrap.getBoundingClientRect();
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    const hasRoomBelow = rect.bottom <= viewportHeight - 8;
+    if (!hasRoomBelow) wrap.classList.add("pin-picker-up");
+  };
+
+  requestAnimationFrame(placePinPicker);
 }
 
 function buildScorecardBody(round, team, canEdit = true) {
