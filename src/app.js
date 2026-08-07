@@ -278,6 +278,25 @@ function saveState() {
   }
 }
 
+function mergeScores(local, incoming) {
+  // Prefer server value; fall back to local so a server reset can't wipe entered scores
+  const merged = {};
+  for (const r of ROUNDS) {
+    merged[r.id] = {};
+    const holeCount = holeCountForCourse(r.course);
+    for (const t of r.teams) {
+      const lh = local?.[r.id]?.[t.tee] ?? [];
+      const ih = incoming?.[r.id]?.[t.tee] ?? [];
+      merged[r.id][t.tee] = Array.from({ length: holeCount }, (_, i) => {
+        const iv = (ih[i] == null || ih[i] === "") ? "" : String(ih[i]);
+        const lv = (lh[i] == null || lh[i] === "") ? "" : String(lh[i]);
+        return iv !== "" ? iv : lv;
+      });
+    }
+  }
+  return merged;
+}
+
 function applyIncomingState(incoming) {
   if (!incoming?.scores) return;
   if (isScoreInputFocused()) {
@@ -286,7 +305,7 @@ function applyIncomingState(incoming) {
     return;
   }
   isApplyingServerUpdate = true;
-  state.scores = normalizeScores(incoming.scores);
+  state.scores = mergeScores(state.scores, incoming.scores);
   if (incoming.pins && typeof incoming.pins === "object") state.pins = incoming.pins;
   if (Array.isArray(incoming.chat)) {
     const ids = new Set((state.chat || []).map(m => m.id));
