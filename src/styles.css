@@ -621,6 +621,15 @@ button:disabled {
   text-align: center;
 }
 
+.scorecard th.col-pin,
+.scorecard td.pin-col {
+  width: 70px;
+  min-width: 70px;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: left;
+}
+
 .hole-length,
 .hole-stroke-index {
   color: var(--muted);
@@ -1310,6 +1319,14 @@ button:disabled {
     padding-right: 2px;
   }
 
+  .scorecard th.col-pin,
+  .scorecard td.pin-col {
+    width: 56px;
+    min-width: 56px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
   .score-cell {
     padding: 4px 2px !important;
     width: 70px;
@@ -1376,7 +1393,7 @@ table.scorecard.has-pins .pin-col { display: table-cell; }
 .pin-picker {
   position: absolute;
   top: calc(100% + 6px);
-  right: 12px;
+  left: 0;
   z-index: 40;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1413,9 +1430,9 @@ table.scorecard.has-pins .pin-col { display: table-cell; }
   .pin-picker {
     grid-template-columns: 1fr;
     max-height: 184px;
-    min-width: 148px;
-    max-width: min(70vw, 220px);
-    right: 18px;
+    min-width: 132px;
+    max-width: min(66vw, 200px);
+    left: 0;
   }
 }
 

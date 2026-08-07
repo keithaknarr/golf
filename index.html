@@ -105,12 +105,12 @@
                   <thead>
                     <tr>
                       <th scope="col" class="score-col-header">Score</th>
+                      <th scope="col" class="pin-col col-pin">📍 Pin</th>
                       <th scope="col" class="col-hole">Hole</th>
                       <th scope="col" class="col-yds">Yds</th>
                       <th scope="col" class="col-par">Par</th>
                       <th scope="col" class="col-hc">HC</th>
                       <th scope="col" class="col-diff">+/−</th>
-                      <th scope="col" class="pin-col">📍 Pin</th>
                     </tr>
                   </thead>
                   <tbody id="sc-body"></tbody>
@@ -178,24 +178,24 @@
         <td class="score-cell">
           <input type="number" class="score-input" data-score-input min="1" max="12" step="1" inputmode="numeric" aria-label="Score" />
         </td>
+        <td class="pin-col" data-pin-cell></td>
         <th scope="row" class="hole-label" data-num></th>
         <td class="hole-length" data-yds></td>
         <td class="hole-par" data-par></td>
         <td class="hole-stroke-index" data-si></td>
         <td class="result-cell"><span class="result-pill" data-result></span></td>
-        <td class="pin-col" data-pin-cell></td>
       </tr>
     </template>
 
     <template id="sc-sub-tpl">
       <tr class="subtotal-row">
         <td data-sub-score></td>
+        <td class="pin-col"></td>
         <th scope="row" data-sub-label></th>
         <td data-sub-yds></td>
         <td data-sub-par></td>
         <td></td>
         <td data-sub-result></td>
-        <td class="pin-col"></td>
       </tr>
     </template>
 
