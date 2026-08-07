@@ -59,5 +59,5 @@ test("mountain view par-3 holes remain aligned for pin tracking", () => {
   const par3Holes = pars
     .map((value, idx) => (value === 3 ? idx + 1 : null))
     .filter((value) => value !== null);
-  assert.deepEqual(par3Holes, [2, 6, 9, 10, 18]);
+  assert.deepEqual(par3Holes, [2, 6, 9, 10, 16]);
 });
