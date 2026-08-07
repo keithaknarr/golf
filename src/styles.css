@@ -693,8 +693,27 @@ button:disabled {
   }
 
   .hero {
-    padding: 14px 16px;
-    gap: 12px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .hero .eyebrow { display: none; }
+
+  .hero-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .stat {
+    padding: 8px 10px;
+    border-radius: 12px;
+  }
+
+  .stat-label { font-size: 0.68rem; }
+
+  .stat strong {
+    margin-top: 4px;
+    font-size: 1rem;
   }
 
   .panel {
@@ -717,15 +736,8 @@ button:disabled {
     align-items: start;
   }
 
-  .hero-stats {
-    grid-template-columns: 1fr;
-  }
-
   .tabs {
     flex-direction: row;
-  }
-
-  .tabs {
     gap: 4px;
   }
 
