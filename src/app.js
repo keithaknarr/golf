@@ -38,7 +38,7 @@ const COURSES = {
   },
 };
 
-const ROUNDS = [
+const ARCHIVED_ROUNDS = [
   {
     id: "thu-pm", label: "Thu PM", fullLabel: "Thursday · Afternoon",
     course: COURSES.skytop,
@@ -87,6 +87,9 @@ const ROUNDS = [
         {name:"Cisco",hcp:14},{name:"Claudia",hcp:15}]},
     ],
   },
+];
+
+const ROUNDS = [
   {
     id: "fri-pm", label: "Fri PM", fullLabel: "Friday · Afternoon",
     course: COURSES.mountainView,
@@ -161,6 +164,8 @@ const ROUNDS = [
   },
 ];
 
+const ALL_ROUNDS = [...ARCHIVED_ROUNDS, ...ROUNDS];
+
 // --- Utilities ---
 
 function parseNumber(value) {
@@ -186,7 +191,7 @@ function holeCountForCourse(course) {
 
 function emptyScores() {
   const s = {};
-  for (const r of ROUNDS) {
+  for (const r of ALL_ROUNDS) {
     s[r.id] = {};
     const holeCount = holeCountForCourse(r.course);
     for (const t of r.teams) s[r.id][t.tee] = Array(holeCount).fill("");
@@ -196,7 +201,7 @@ function emptyScores() {
 
 function normalizeScores(raw) {
   const s = {};
-  for (const r of ROUNDS) {
+  for (const r of ALL_ROUNDS) {
     s[r.id] = {};
     const holeCount = holeCountForCourse(r.course);
     for (const t of r.teams) {
@@ -233,7 +238,7 @@ function normalizeState(raw) {
   return {
     version: STATE_VERSION,
     activeRound,
-    activeView: activeTee && raw.activeView === "scorecard" ? "scorecard" : "leaderboard",
+    activeView: activeTee && raw.activeView === "scorecard" ? "scorecard" : raw.activeView === "archive" ? "archive" : "leaderboard",
     activeTee,
     scores: normalizeScores(raw.scores),
     pins: (raw.pins && typeof raw.pins === "object") ? raw.pins : {},
@@ -343,8 +348,9 @@ function calcMetrics(roundId, tee, course) {
 
 // --- DOM refs ---
 
-const viewLB    = document.getElementById("view-leaderboard");
-const viewSC    = document.getElementById("view-scorecard");
+const viewLB      = document.getElementById("view-leaderboard");
+const viewSC      = document.getElementById("view-scorecard");
+const viewArchive = document.getElementById("view-archive");
 const lbBody    = document.getElementById("lb-body");
 const scBody    = document.getElementById("sc-body");
 const lbRowTpl  = document.getElementById("lb-row-tpl");
@@ -433,15 +439,82 @@ function renderAll() {
   document.body.style.overflow = "";
   updateUserPill();
 
+  const showArchive = state.activeView === "archive";
   const round = ROUNDS.find(r => r.id === state.activeRound) || ROUNDS[0];
-  roundTabs.forEach(b => b.classList.toggle("is-active", b.dataset.round === state.activeRound));
+  roundTabs.forEach(b => b.classList.toggle("is-active", !showArchive && b.dataset.round === state.activeRound));
+  const archiveTabEl = document.getElementById("archive-tab");
+  if (archiveTabEl) archiveTabEl.classList.toggle("is-active", showArchive);
+
+  if (showArchive) {
+    heroRound.textContent  = "Past";
+    heroCourse.textContent = "Results";
+    heroLeader.textContent = "—";
+    viewLB.hidden = true;
+    viewSC.hidden = true;
+    viewArchive.hidden = false;
+    renderArchiveView();
+    return;
+  }
+
   heroRound.textContent  = round.label;
   heroCourse.textContent = round.course.name.replace(" Golf Course", "");
   const showSC = state.activeView === "scorecard" && state.activeTee !== null;
   viewLB.hidden = showSC;
   viewSC.hidden = !showSC;
+  viewArchive.hidden = true;
   if (showSC) renderScorecardView(round);
   else renderLeaderboard(round);
+}
+
+function renderArchiveView() {
+  const archiveBody = document.getElementById("archive-body");
+  archiveBody.innerHTML = "";
+  const medals = ["🥇", "🥈", "🥉"];
+  for (const round of ARCHIVED_ROUNDS) {
+    const section = document.createElement("div");
+    section.className = "archive-round";
+    const heading = document.createElement("div");
+    heading.className = "archive-round-heading";
+    const h3 = document.createElement("h3");
+    h3.textContent = round.fullLabel;
+    const badge = document.createElement("span");
+    badge.className = "course-badge";
+    badge.textContent = round.course.name;
+    heading.appendChild(h3);
+    heading.appendChild(badge);
+    section.appendChild(heading);
+    const scored = sortedTeams(round).filter(t => calcMetrics(round.id, t.tee, round.course).played > 0);
+    if (scored.length === 0) {
+      const p = document.createElement("p");
+      p.className = "archive-empty";
+      p.textContent = "No scores recorded.";
+      section.appendChild(p);
+    } else {
+      const list = document.createElement("ol");
+      list.className = "archive-podium";
+      scored.slice(0, 3).forEach((team, i) => {
+        const m = calcMetrics(round.id, team.tee, round.course);
+        const net = m.relToPar + team.headStart;
+        const li = document.createElement("li");
+        li.className = "archive-podium-item" + (i === 0 ? " is-winner" : "");
+        const medal = document.createElement("span");
+        medal.className = "podium-medal";
+        medal.textContent = medals[i];
+        const players = document.createElement("span");
+        players.className = "podium-players";
+        players.textContent = team.players.map(p => p.name.split(" ")[0]).join(", ");
+        const score = document.createElement("span");
+        score.className = "podium-score " + (net < 0 ? "score-under" : net > 0 ? "score-over" : "score-even");
+        score.textContent = fmtScore(net);
+        li.appendChild(medal);
+        li.appendChild(players);
+        li.appendChild(score);
+        list.appendChild(li);
+      });
+      section.appendChild(list);
+    }
+    archiveBody.appendChild(section);
+  }
 }
 
 function sortedTeams(round) {
@@ -938,6 +1011,16 @@ roundTabs.forEach(btn => {
     renderAll();
   });
 });
+
+const archiveTabEl = document.getElementById("archive-tab");
+if (archiveTabEl) {
+  archiveTabEl.addEventListener("click", () => {
+    state.activeView = "archive";
+    state.activeTee  = null;
+    saveState();
+    renderAll();
+  });
+}
 
 // --- Live sync ---
 

@@ -43,11 +43,10 @@
         </div>
         <button class="ghost-button find-me-btn" id="matchups-btn" type="button">Matchups</button>
         <div class="tabs-rounds">
-          <button class="tab-button" type="button" data-round="thu-pm">Thu PM</button>
-          <button class="tab-button" type="button" data-round="fri-am">Fri AM</button>
           <button class="tab-button" type="button" data-round="fri-pm">Fri PM</button>
           <button class="tab-button" type="button" data-round="sat-am">Sat AM</button>
           <button class="tab-button" type="button" data-round="sat-pm">Sat PM</button>
+          <button class="tab-button" type="button" id="archive-tab">Past</button>
         </div>
         <div class="tabs-status-right">
           <span id="live-dot" class="live-dot" title="Live sync">Live</span>
@@ -158,6 +157,16 @@
 
           </div>
         </section>
+
+        <section class="view card panel" id="view-archive" hidden>
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Completed rounds</p>
+              <h2>Past Results</h2>
+            </div>
+          </div>
+          <div id="archive-body"></div>
+        </section>
       </main>
     </div>
 
@@ -240,6 +249,6 @@
       </div>
     </div>
 
-    <script src="./src/app.js?v=20260807fix1"></script>
+    <script src="./src/app.js?v=20260807c"></script>
   </body>
 </html>

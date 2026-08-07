@@ -960,6 +960,55 @@ button:disabled {
   opacity: 0.9;
 }
 
+/* === Archive / Past Results view === */
+
+#view-archive .panel-heading { margin-bottom: 4px; }
+
+.archive-round {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.archive-round:last-child { border-bottom: none; }
+
+.archive-round-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.archive-round-heading h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.archive-podium {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+}
+.archive-podium-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.archive-podium-item.is-winner {
+  background: rgba(115, 245, 167, 0.08);
+  border: 1px solid rgba(115, 245, 167, 0.18);
+}
+.podium-medal { font-size: 1.3rem; width: 28px; text-align: center; flex-shrink: 0; }
+.podium-players { flex: 1; font-size: 0.9rem; }
+.podium-score { font-weight: 700; font-size: 1rem; }
+
+.archive-empty { color: var(--muted); font-size: 0.9rem; padding: 4px 0; margin: 0; }
+
 /* === Player lookup modal === */
 
 .modal-overlay {
