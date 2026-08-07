@@ -948,12 +948,15 @@ function requestStateFromServer() {
     .catch(() => {});
 }
 
+let sseErrorTimer = null;
+
 function connectToServer() {
   if (!isServed()) return;
   try {
     const es = new EventSource(buildApiUrl("/api/events"));
     es.addEventListener("open", () => {
       if (liveDot) liveDot.classList.add("is-live");
+      if (sseErrorTimer) { clearTimeout(sseErrorTimer); sseErrorTimer = null; }
       requestStateFromServer();
       syncToServer();
     });
@@ -970,6 +973,14 @@ function connectToServer() {
     });
     es.addEventListener("error", () => {
       if (liveDot) liveDot.classList.remove("is-live");
+      // If SSE stays broken for 10s, tear down and reconnect from scratch
+      if (!sseErrorTimer) {
+        sseErrorTimer = setTimeout(() => {
+          sseErrorTimer = null;
+          es.close();
+          connectToServer();
+        }, 10_000);
+      }
     });
     if (syncPollTimer) clearInterval(syncPollTimer);
     syncPollTimer = setInterval(requestStateFromServer, 5000);

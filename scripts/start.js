@@ -66,6 +66,11 @@ function broadcastState() {
   for (const res of sseClients) res.write(payload);
 }
 
+// Prevent proxy idle-timeout from killing SSE connections (Render times out at ~90s)
+setInterval(() => {
+  for (const res of sseClients) res.write(": keepalive\n\n");
+}, 20_000);
+
 const resolveFilePath = (requestPath) => {
   const normalizedPath = requestPath === "/" ? "/index.html" : requestPath;
   const safePath = path.normalize(decodeURIComponent(normalizedPath)).replace(/^([/\\])+/, "");
