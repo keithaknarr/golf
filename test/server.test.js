@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { loadStateFromDisk, persistStateToDisk } from "../scripts/start.js";
+import { clearTeamScores, loadStateFromDisk, persistStateToDisk } from "../scripts/start.js";
 
 function parseNumberList(listText) {
   return listText
@@ -35,6 +35,25 @@ test("persists and reloads state from disk", () => {
   assert.deepEqual(reloaded, sampleState);
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test("clears scores for a single team without touching other teams", () => {
+  const sampleState = {
+    version: 2,
+    scores: {
+      "fri-pm": {
+        4: ["4", "5", "3"],
+        5: ["5", "4", "4"],
+      },
+    },
+  };
+
+  const cleared = clearTeamScores(sampleState, "fri-pm", 4);
+
+  assert.deepEqual(cleared.scores["fri-pm"][4], ["", "", ""]);
+  assert.deepEqual(cleared.scores["fri-pm"][5], ["5", "4", "4"]);
+  assert.equal(typeof cleared.resets["fri-pm"][4], "number");
+  assert.deepEqual(sampleState.scores["fri-pm"][4], ["4", "5", "3"]);
 });
 
 test("mountain view hole 5 is a par 4", () => {

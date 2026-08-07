@@ -50,6 +50,30 @@ function persistStateToDisk(state, filePath = stateFile) {
   } catch {}
 }
 
+function clearTeamScores(state, roundId, tee) {
+  if (!state || typeof state !== "object") return state;
+  const existingTeamScores = state.scores?.[roundId]?.[tee];
+  if (!Array.isArray(existingTeamScores)) return state;
+  const resetAt = Date.now();
+  return {
+    ...state,
+    scores: {
+      ...state.scores,
+      [roundId]: {
+        ...state.scores[roundId],
+        [tee]: existingTeamScores.map(() => ""),
+      },
+    },
+    resets: {
+      ...(state.resets || {}),
+      [roundId]: {
+        ...(state.resets?.[roundId] || {}),
+        [tee]: resetAt,
+      },
+    },
+  };
+}
+
 function writeHealth() {
   try {
     fs.mkdirSync(path.dirname(healthFile), { recursive: true });
@@ -61,8 +85,15 @@ function writeHealth() {
 let serverState = loadStateFromDisk();
 const sseClients = new Set();
 
-// Never let an incoming empty hole overwrite a recorded score
-function mergeScores(base, incoming) {
+function normalizeScoreArray(values, length) {
+  return Array.from({ length }, (_, i) => {
+    const value = values?.[i];
+    return value == null || value === "" ? "" : String(value);
+  });
+}
+
+// Never let an incoming empty hole overwrite a recorded score unless an explicit reset marker wins.
+function mergeScores(base, incoming, baseResets = {}, incomingResets = {}) {
   if (!base) return incoming;
   if (!incoming) return base;
   const merged = {};
@@ -74,6 +105,19 @@ function mergeScores(base, incoming) {
       const b = base[rid]?.[tee] ?? [];
       const inc = incoming[rid]?.[tee] ?? [];
       const len = Math.max(b.length, inc.length);
+      const baseResetAt = Number(baseResets?.[rid]?.[tee]) || 0;
+      const incomingResetAt = Number(incomingResets?.[rid]?.[tee]) || 0;
+
+      if (incomingResetAt > baseResetAt) {
+        merged[rid][tee] = normalizeScoreArray(inc, len);
+        continue;
+      }
+
+      if (baseResetAt > incomingResetAt) {
+        merged[rid][tee] = normalizeScoreArray(b, len);
+        continue;
+      }
+
       merged[rid][tee] = Array.from({ length: len }, (_, i) => {
         const iv = (inc[i] == null || inc[i] === "") ? "" : String(inc[i]);
         const bv = (b[i]  == null || b[i]  === "") ? "" : String(b[i]);
@@ -159,7 +203,11 @@ const server = http.createServer((request, response) => {
           }
           serverState = {
             ...parsed,
-            scores: mergeScores(serverState?.scores, parsed.scores),
+            scores: mergeScores(serverState?.scores, parsed.scores, serverState?.resets, parsed.resets),
+            resets: {
+              ...(serverState?.resets || {}),
+              ...(parsed.resets || {}),
+            },
             pins: { ...(serverState?.pins || {}), ...(parsed.pins || {}) },
             chat: (() => {
               const ids = new Set((serverState?.chat || []).map(m => m.id));
@@ -225,4 +273,4 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   startServer();
 }
 
-export { loadStateFromDisk, persistStateToDisk, startServer };
+export { clearTeamScores, loadStateFromDisk, persistStateToDisk, startServer };

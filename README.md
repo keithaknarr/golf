@@ -19,6 +19,9 @@ Run `npm start`, then open http://localhost:8000.
 
 Use the Team page to enter scores. Use the Leaderboard page to compare teams.
 
+To clear one team from the persisted shared state file, run `npm run clear-team -- <round-id> <tee> [state-file]`.
+For Pandy's Friday PM team, use `npm run clear-team -- fri-pm 4`.
+
 ## Hosting
 
 This app uses a small Node server for live score syncing, so it should be deployed on a host that supports server-side Node.js and keeps the process running continuously. The current Render configuration is the recommended path for a 6-day event because it can keep the app online and expose a health endpoint.

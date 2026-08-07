@@ -224,6 +224,7 @@ function createDefaultState() {
     activeView: "leaderboard",
     activeTee: null,
     scores: emptyScores(),
+    resets: {},
     pins: {},
     chat: [],
   };
@@ -241,6 +242,7 @@ function normalizeState(raw) {
     activeView: activeTee && raw.activeView === "scorecard" ? "scorecard" : raw.activeView === "archive" ? "archive" : "leaderboard",
     activeTee,
     scores: normalizeScores(raw.scores),
+    resets: (raw.resets && typeof raw.resets === "object") ? raw.resets : {},
     pins: (raw.pins && typeof raw.pins === "object") ? raw.pins : {},
     chat: Array.isArray(raw.chat) ? raw.chat.slice(-100) : [],
   };
@@ -283,8 +285,14 @@ function saveState() {
   }
 }
 
-function mergeScores(local, incoming) {
-  // Prefer server value; fall back to local so a server reset can't wipe entered scores
+function normalizeScoreArray(values, length) {
+  return Array.from({ length }, (_, i) => {
+    const value = values?.[i];
+    return value == null || value === "" ? "" : String(value);
+  });
+}
+
+function mergeScores(local, incoming, localResets = {}, incomingResets = {}) {
   const merged = {};
   for (const r of ROUNDS) {
     merged[r.id] = {};
@@ -292,6 +300,19 @@ function mergeScores(local, incoming) {
     for (const t of r.teams) {
       const lh = local?.[r.id]?.[t.tee] ?? [];
       const ih = incoming?.[r.id]?.[t.tee] ?? [];
+      const localResetAt = Number(localResets?.[r.id]?.[t.tee]) || 0;
+      const incomingResetAt = Number(incomingResets?.[r.id]?.[t.tee]) || 0;
+
+      if (incomingResetAt > localResetAt) {
+        merged[r.id][t.tee] = normalizeScoreArray(ih, holeCount);
+        continue;
+      }
+
+      if (localResetAt > incomingResetAt) {
+        merged[r.id][t.tee] = normalizeScoreArray(lh, holeCount);
+        continue;
+      }
+
       merged[r.id][t.tee] = Array.from({ length: holeCount }, (_, i) => {
         const iv = (ih[i] == null || ih[i] === "") ? "" : String(ih[i]);
         const lv = (lh[i] == null || lh[i] === "") ? "" : String(lh[i]);
@@ -310,7 +331,8 @@ function applyIncomingState(incoming) {
     return;
   }
   isApplyingServerUpdate = true;
-  state.scores = mergeScores(state.scores, incoming.scores);
+  state.scores = mergeScores(state.scores, incoming.scores, state.resets, incoming.resets);
+  if (incoming.resets && typeof incoming.resets === "object") state.resets = incoming.resets;
   if (incoming.pins && typeof incoming.pins === "object") state.pins = incoming.pins;
   if (Array.isArray(incoming.chat)) {
     const ids = new Set((state.chat || []).map(m => m.id));
