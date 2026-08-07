@@ -253,6 +253,19 @@ let myName = localStorage.getItem(MY_NAME_KEY) || null;
 let syncTimer = null;
 let syncPollTimer = null;
 let isApplyingServerUpdate = false;
+let pendingIncomingState = null;
+
+function isScoreInputFocused() {
+  const active = document.activeElement;
+  return !!active && active.matches?.(".score-input");
+}
+
+function flushPendingIncomingState() {
+  if (!pendingIncomingState || isScoreInputFocused()) return;
+  const next = pendingIncomingState;
+  pendingIncomingState = null;
+  applyIncomingState(next);
+}
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -267,6 +280,11 @@ function saveState() {
 
 function applyIncomingState(incoming) {
   if (!incoming?.scores) return;
+  if (isScoreInputFocused()) {
+    // Keep score entry stable while the user is typing.
+    pendingIncomingState = incoming;
+    return;
+  }
   isApplyingServerUpdate = true;
   state.scores = normalizeScores(incoming.scores);
   if (incoming.pins && typeof incoming.pins === "object") state.pins = incoming.pins;
@@ -761,9 +779,11 @@ function buildScorecardBody(round, team, canEdit = true) {
       const curr = parseNumber(state.scores[round.id][team.tee][i]);
       if (curr === null) {
         displayEl.value = "";
+        setTimeout(flushPendingIncomingState, 0);
         return;
       }
       setScore(curr);
+      setTimeout(flushPendingIncomingState, 0);
     });
 
     if (course.pars[i] === 3) {
