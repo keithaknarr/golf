@@ -58,7 +58,7 @@ test("mountain view par-3 holes remain aligned for pin tracking", () => {
 
   const parMatch = mountainViewBlock[1].match(/par:\s*(\d+)/);
   assert.ok(parMatch, "Expected mountainView par value");
-  assert.equal(Number.parseInt(parMatch[1], 10), 70);
+  assert.equal(Number.parseInt(parMatch[1], 10), 71);
 
   const parsMatch = mountainViewBlock[1].match(/pars:\s*\[([^\]]+)\]/);
   assert.ok(parsMatch, "Expected mountainView pars array");
@@ -66,7 +66,7 @@ test("mountain view par-3 holes remain aligned for pin tracking", () => {
 
   assert.equal(pars.length, 18, "Expected 18 hole pars");
   const parTotal = pars.reduce((sum, value) => sum + value, 0);
-  assert.equal(parTotal, 70, "Mountain View par total should be 70");
+  assert.equal(parTotal, 71, "Mountain View par total should be 71");
 
   const par3Holes = pars
     .map((value, idx) => (value === 3 ? idx + 1 : null))
