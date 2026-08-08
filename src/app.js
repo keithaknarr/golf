@@ -1042,11 +1042,18 @@ if (archiveTabEl) {
 
 function isServed() { return window.location.protocol !== "file:"; }
 
+// Bounds how long a stalled request can linger on a flaky connection before we give up and retry later.
+function fetchWithTimeout(resource, options = {}, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(resource, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+}
+
 function syncToServer() {
   if (!isServed()) return;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(() => {
-    fetch(buildApiUrl("/api/state"), {
+    fetchWithTimeout(buildApiUrl("/api/state"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(state),
@@ -1058,7 +1065,7 @@ function syncToServer() {
 
 function requestStateFromServer() {
   if (!isServed()) return;
-  fetch(buildApiUrl("/api/state"), { method: "GET" })
+  fetchWithTimeout(buildApiUrl("/api/state"), { method: "GET" })
     .then((response) => response.ok ? response.json() : null)
     .then((incoming) => {
       if (incoming && typeof incoming === "object") applyIncomingState(incoming);
@@ -1076,6 +1083,14 @@ window.addEventListener("storage", (event) => {
 });
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) requestStateFromServer();
+});
+// Wifi on a golf course drops in and out — push/pull as soon as the connection returns.
+window.addEventListener("online", () => {
+  requestStateFromServer();
+  syncToServer();
+});
+window.addEventListener("offline", () => {
+  if (liveDot) liveDot.classList.remove("is-live");
 });
 
 function connectToServer() {
