@@ -20,7 +20,7 @@ Run `npm start`, then open http://localhost:8000.
 Use the Team page to enter scores. Use the Leaderboard page to compare teams.
 
 To clear one team from the persisted shared state file, run `npm run clear-team -- <round-id> <tee> [state-file]`.
-For Pandy's Friday PM team, use `npm run clear-team -- fri-pm 4`.
+For Pandy's Saturday AM team, use `npm run clear-team -- sat-am 1`.
 
 ## Hosting
 

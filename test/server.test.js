@@ -56,6 +56,21 @@ test("clears scores for a single team without touching other teams", () => {
   assert.deepEqual(sampleState.scores["fri-pm"][4], ["4", "5", "3"]);
 });
 
+test("removes Friday rounds from schedule definitions", () => {
+  const appJsPath = path.join(process.cwd(), "src", "app.js");
+  const source = fs.readFileSync(appJsPath, "utf8");
+
+  const archivedBlock = source.match(/const ARCHIVED_ROUNDS = \[([\s\S]*?)\n\];/);
+  assert.ok(archivedBlock, "Expected ARCHIVED_ROUNDS block in src/app.js");
+  assert.equal(archivedBlock[1].includes('id: "fri-am"'), false, "Friday morning round should not be archived");
+  assert.equal(archivedBlock[1].includes('id: "fri-pm"'), false, "Friday afternoon round should not be archived");
+
+  const activeBlock = source.match(/const ROUNDS = \[([\s\S]*?)\n\];/);
+  assert.ok(activeBlock, "Expected ROUNDS block in src/app.js");
+  assert.equal(activeBlock[1].includes('id: "fri-am"'), false, "Friday morning round should not be active");
+  assert.equal(activeBlock[1].includes('id: "fri-pm"'), false, "Friday afternoon round should not be active");
+});
+
 test("mountain view hole 5 is a par 4", () => {
   const appJsPath = path.join(process.cwd(), "src", "app.js");
   const source = fs.readFileSync(appJsPath, "utf8");

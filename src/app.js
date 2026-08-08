@@ -63,57 +63,9 @@ const ARCHIVED_ROUNDS = [
         {name:"Ryan",hcp:8.5},{name:"Larry",hcp:10}]},
     ],
   },
-  {
-    id: "fri-am", label: "Fri AM", fullLabel: "Friday · Morning",
-    course: COURSES.mountainView,
-    teams: [
-      { tee:1, teeTime:"8:03 AM", headStart:-2, players:[
-        {name:"Keith",hcp:10},{name:"Dave RN",hcp:10},
-        {name:"Matt",hcp:12},{name:"Jay",hcp:13}]},
-      { tee:2, teeTime:"8:12 AM", headStart:-1, players:[
-        {name:"Zeke",hcp:6},{name:"Lloyd",hcp:12},
-        {name:"Kisel",hcp:12},{name:"Josh",hcp:14}]},
-      { tee:3, teeTime:"8:21 AM", headStart:0, players:[
-        {name:"Chris",hcp:4},{name:"Nevin",hcp:7},
-        {name:"Jap",hcp:11},{name:"Sarka",hcp:18}]},
-      { tee:4, teeTime:"8:30 AM", headStart:0, players:[
-        {name:"Donny",hcp:7},{name:"Mike",hcp:9},
-        {name:"Larry",hcp:10},{name:"Betty",hcp:13}]},
-      { tee:5, teeTime:"8:39 AM", headStart:-1, players:[
-        {name:"Pandy",hcp:6},{name:"Ryan",hcp:8.5},
-        {name:"Eric",hcp:16},{name:"Ben",hcp:17}]},
-      { tee:6, teeTime:"8:48 AM", headStart:-2, players:[
-        {name:"Drew",hcp:8},{name:"Ricky",hcp:10},
-        {name:"Cisco",hcp:14},{name:"Claudia",hcp:15}]},
-    ],
-  },
 ];
 
 const ROUNDS = [
-  {
-    id: "fri-pm", label: "Fri PM", fullLabel: "Friday · Afternoon",
-    course: COURSES.mountainView,
-    teams: [
-      { tee:1, teeTime:"1:27 PM", headStart:0, players:[
-        {name:"Nevin",hcp:7},{name:"Mike",hcp:9},
-        {name:"Keith",hcp:10},{name:"Lloyd",hcp:12}]},
-      { tee:2, teeTime:"1:36 PM", headStart:0, players:[
-        {name:"Chris",hcp:4},{name:"Larry",hcp:10},
-        {name:"Jay",hcp:13},{name:"Josh",hcp:14}]},
-      { tee:3, teeTime:"1:45 PM", headStart:-3, players:[
-        {name:"Kisel",hcp:12},{name:"Betty",hcp:13},
-        {name:"Cisco",hcp:14},{name:"Eric",hcp:16}]},
-      { tee:4, teeTime:"1:54 PM", headStart:-1, players:[
-        {name:"Zeke",hcp:6},{name:"Pandy",hcp:6},
-        {name:"Claudia",hcp:15},{name:"Sarka",hcp:18}]},
-      { tee:5, teeTime:"2:03 PM", headStart:0, players:[
-        {name:"Donny",hcp:7},{name:"Ryan",hcp:8.5},
-        {name:"Dave RN",hcp:10},{name:"Ricky",hcp:10}]},
-      { tee:6, teeTime:"2:12 PM", headStart:-2, players:[
-        {name:"Drew",hcp:8},{name:"Jap",hcp:11},
-        {name:"Matt",hcp:12},{name:"Ben",hcp:17}]},
-    ],
-  },
   {
     id: "sat-am", label: "Sat AM", fullLabel: "Saturday · Morning",
     course: COURSES.mountainView,
@@ -236,16 +188,58 @@ function normalizeState(raw) {
   const activeRound = ROUNDS.find(r => r.id === raw.activeRound)?.id ?? ROUNDS[0].id;
   const round = ROUNDS.find(r => r.id === activeRound);
   const activeTee = round?.teams.some(t => t.tee === raw.activeTee) ? raw.activeTee : null;
+  const sanitizedScores = normalizeScores(raw.scores);
+  const sanitizedResets = (raw.resets && typeof raw.resets === "object") ? raw.resets : {};
+  const sanitizedPins = (raw.pins && typeof raw.pins === "object") ? raw.pins : {};
+  const sanitizedChat = Array.isArray(raw.chat) ? raw.chat.slice(-100) : [];
   return {
     version: STATE_VERSION,
     activeRound,
     activeView: activeTee && raw.activeView === "scorecard" ? "scorecard" : raw.activeView === "archive" ? "archive" : "leaderboard",
     activeTee,
-    scores: normalizeScores(raw.scores),
-    resets: (raw.resets && typeof raw.resets === "object") ? raw.resets : {},
-    pins: (raw.pins && typeof raw.pins === "object") ? raw.pins : {},
-    chat: Array.isArray(raw.chat) ? raw.chat.slice(-100) : [],
+    scores: sanitizeRoundData(sanitizedScores),
+    resets: sanitizeRoundResets(sanitizedResets),
+    pins: sanitizeRoundPins(sanitizedPins),
+    chat: sanitizedChat,
   };
+}
+
+function sanitizeRoundData(scores) {
+  const next = {};
+  for (const round of ROUNDS) {
+    next[round.id] = {};
+    for (const team of round.teams) {
+      const values = scores?.[round.id]?.[team.tee] ?? [];
+      next[round.id][team.tee] = Array.isArray(values)
+        ? values.slice(0, holeCountForCourse(round.course))
+        : [];
+    }
+  }
+  return next;
+}
+
+function sanitizeRoundResets(resets) {
+  const next = {};
+  for (const round of ROUNDS) {
+    next[round.id] = {};
+    for (const team of round.teams) {
+      if (typeof resets?.[round.id]?.[team.tee] === "number") {
+        next[round.id][team.tee] = resets[round.id][team.tee];
+      }
+    }
+  }
+  return next;
+}
+
+function sanitizeRoundPins(pins) {
+  const next = {};
+  for (const round of ROUNDS) {
+    for (const team of round.teams) {
+      const pinValue = pins?.[round.id]?.[team.tee];
+      if (pinValue != null) next[`${round.id}:${team.tee}`] = pinValue;
+    }
+  }
+  return next;
 }
 
 function loadState() {
@@ -1074,6 +1068,16 @@ function requestStateFromServer() {
 
 let sseErrorTimer = null;
 
+// Registered once — must not be re-added on every reconnect or listeners pile up over a long session.
+window.addEventListener("storage", (event) => {
+  if (event.key === `${STORAGE_KEY}:sync` && event.newValue) {
+    syncToServer();
+  }
+});
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) requestStateFromServer();
+});
+
 function connectToServer() {
   if (!isServed()) return;
   try {
@@ -1083,11 +1087,6 @@ function connectToServer() {
       if (sseErrorTimer) { clearTimeout(sseErrorTimer); sseErrorTimer = null; }
       requestStateFromServer();
       syncToServer();
-    });
-    window.addEventListener("storage", (event) => {
-      if (event.key === `${STORAGE_KEY}:sync` && event.newValue) {
-        syncToServer();
-      }
     });
     es.addEventListener("message", (event) => {
       try {
@@ -1108,9 +1107,6 @@ function connectToServer() {
     });
     if (syncPollTimer) clearInterval(syncPollTimer);
     syncPollTimer = setInterval(requestStateFromServer, 5000);
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) requestStateFromServer();
-    });
   } catch {
     if (liveDot) liveDot.classList.remove("is-live");
   }
